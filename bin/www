@@ -4,25 +4,62 @@
  * Module dependencies.
  */
 
-// var app = require('../app');
-// var debug = require('debug')('whale-tracker:server');
-// var http = require('http');
+var app = require('../app');
+var debug = require('debug')('whale-tracker:server');
+var http = require('http');
 
-
+const trade = require('./trade');
 const WebSocket = require('ws');
 
-const btc_binance = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade');
-// const eos_binance = new WebSocket('wss://stream.binance.com:9443/ws/eosbtc@aggTrade')
+const trade_history = {
+  btc_binance: new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade'),
+  eos_binance: new WebSocket('wss://stream.binance.com:9443/ws/eosbtc@aggTrade'),
+  bitfinex: new WebSocket('wss://api.bitfinex.com/ws/2'),
+  gdax: new WebSocket('wss://ws-feed.gdax.com')
+};
 
-btc_binance.on('message', function incoming(data) {
-  let trade = JSON.parse(data);
-  let quantity = parseFloat(trade.q);
-  let price = parseFloat(trade.p);
-  // console.log(parseFloat(trade.q));
-  if(quantity >= 3) {
-    console.log(trade.s+" - "+quantity+"@"+price);
-  }
+const refreshStream = () => {
+  trade_history.btc_binance = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade');
+  trade_history.eos_binance = new WebSocket('wss://stream.binance.com:9443/ws/eosbtc@aggTrade');
+}
+
+setInterval(refreshStream, 72000000);
+
+
+trade_history.btc_binance.on('message', function incoming(data) {
+  trade.binance(data);
 });
+
+trade_history.bitfinex.on('open', () => {
+  let request_object = { 
+    event: "subscribe", 
+    channel: "trades", 
+    symbol: "BTCUSD" 
+  }
+  
+  trade_history.bitfinex.send(JSON.stringify(request_object))
+});
+
+trade_history.bitfinex.on('message', (data) => {
+  trade.bitfinex(data);
+})
+
+
+trade_history.gdax.on('open', () => {
+  let request_object = {     
+    "type": "subscribe",     
+    "product_ids": [         
+        "BTC-USD",
+     ],     
+     "channels": ["matches"] 
+  }
+
+  trade_history.gdax.send(JSON.stringify(request_object))
+})
+
+trade_history.gdax.on('message', (data) => {
+  trade.gdax(data);
+})
 
 
 
@@ -30,42 +67,42 @@ btc_binance.on('message', function incoming(data) {
  * Get port from environment and store in Express.
  */
 
-// var port = normalizePort(process.env.PORT || '3000');
-// app.set('port', port);
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-// var server = http.createServer(app);
+var server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-// server.listen(port);
-// server.on('error', onError);
-// server.on('listening', onListening);
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.
  */
 
-// function normalizePort(val) {
-//   var port = parseInt(val, 10);
+function normalizePort(val) {
+  var port = parseInt(val, 10);
 
-//   if (isNaN(port)) {
-//     // named pipe
-//     return val;
-//   }
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
 
-//   if (port >= 0) {
-//     // port number
-//     return port;
-//   }
+  if (port >= 0) {
+    // port number
+    return port;
+  }
 
-//   return false;
-// }
+  return false;
+}
 
 /**
  * Event listener for HTTP server "error" event.

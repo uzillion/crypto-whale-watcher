@@ -13,14 +13,16 @@ const WebSocket = require('ws');
 
 const trade_history = {
   btc_binance: new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade'),
-  eos_binance: new WebSocket('wss://stream.binance.com:9443/ws/eosbtc@aggTrade'),
+  eos_binance: new WebSocket('wss://stream.binance.com:9443/ws/eosusdt@aggTrade'),
+  eth_binance: new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@aggTrade'),
   bitfinex: new WebSocket('wss://api.bitfinex.com/ws/2'),
   gdax: new WebSocket('wss://ws-feed.gdax.com')
 };
 
 const refreshStream = () => {
   trade_history.btc_binance = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade');
-  trade_history.eos_binance = new WebSocket('wss://stream.binance.com:9443/ws/eosbtc@aggTrade');
+  trade_history.eos_binance = new WebSocket('wss://stream.binance.com:9443/ws/eosusdt@aggTrade');
+  trade_history.eth_binance = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@aggTrade');
 }
 
 setInterval(refreshStream, 72000000);
@@ -36,8 +38,18 @@ trade_history.bitfinex.on('open', () => {
     channel: "trades", 
     symbol: "BTCUSD" 
   }
-  
   trade_history.bitfinex.send(JSON.stringify(request_object))
+
+  request_object.symbol = "EOSUSD";
+  trade_history.bitfinex.send(JSON.stringify(request_object))
+
+  request_object.symbol = "LTCUSD";
+  trade_history.bitfinex.send(JSON.stringify(request_object))
+
+  request_object.symbol = "ETHUSD";
+  trade_history.bitfinex.send(JSON.stringify(request_object))
+
+
 });
 
 trade_history.bitfinex.on('message', (data) => {
@@ -50,7 +62,8 @@ trade_history.gdax.on('open', () => {
     "type": "subscribe",     
     "product_ids": [         
         "BTC-USD",
-        "LTC-USD"
+        "LTC-USD",
+        "ETH-USD"
      ],     
      "channels": ["matches"] 
   }

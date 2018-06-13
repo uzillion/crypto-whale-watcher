@@ -4,6 +4,7 @@ const message = require('./message');
 let prev_maker_order_id = "";
 let prev_taker_order_id = "";
 let prev_quantity = 0;
+let current_symbol = "";
 
 const binance = (data) => {
   let trade = JSON.parse(data);
@@ -12,7 +13,7 @@ const binance = (data) => {
   let symbol = trade.s;
   let isMaker = trade.m;
   
-  if((symbol == "BTCUSDT" && quantity > 7) || (symbol == "EOSBTC" && quantity > 1000)) {
+  if((symbol == "BTCUSDT" && quantity > 7) || (symbol == "EOSUSDT" && quantity > 1000) || (symbol == "ETHUSDT" && quantity > 150)) {
   var tickerOptions = {
     uri: `https://api.binance.com/api/v1/ticker/24hr?symbol=${symbol}`,
     headers: {
@@ -49,30 +50,34 @@ const binance = (data) => {
 const bitfinex = (data) => {
   let trade = JSON.parse(data);
   let channel_id = -1;
-  if(trade.chanId)
+  if(trade.chanId) {
     channel_id = trade.chanId;
-  else if(typeof trade[0] == "number")
+    current_symbol = trade.pair;
+  } else if(typeof trade[0] == "number")
     channel_id = trade[0];
 
-  if(trade[2] != undefined)
-  if(trade[1] == "tu" && Math.abs(trade[2][2]) > 7) {
-    let quantity = trade[2][2];
+  if(trade[2] != undefined) {
+  let quantity = trade[2][2];
+  let absQuant = Math.abs(quantity);
+  let symbol = current_symbol;
+  if(trade[1] == "tu" && ((symbol == "BTCUSD" && absQuant > 7) || (symbol == "EOSUSD" && absQuant > 1000) 
+      || (symbol == "LTCUSD" && absQuant > 350) || (symbol == "ETHUSD" && absQuant > 150))) {
     let price = trade[2][3]
     var tickerOptions = {
-      uri: `https://api.bitfinex.com/v2/candles/trade:1D:tBTCUSD/last`,
+      uri: `https://api.bitfinex.com/v2/candles/trade:1D:t${symbol}/last`,
       headers: {
         'User-Agent': 'Request-Promise'
       },
       json: true
     };
-  
+
     request(tickerOptions)
     .then(function (tickerResponse) {
       let volume = tickerResponse[5];
-      if(Math.abs(quantity) > (0.002*volume)) {
+      if(absQuant > (0.002*volume)) {
         let messageObj = {
           event: "TRADE",
-          symbol: "BTCUSD",
+          symbol,
           quantity,
           price,
           exchange: "Bitfinex"
@@ -83,6 +88,7 @@ const bitfinex = (data) => {
     }).catch(function (err) {
       console.log(err);
     });
+  }
   }
 }
 
@@ -102,7 +108,7 @@ const gdax = (data) => {
     prev_taker_order_id = taker_order_id;
     prev_quantity = quantity;
   }
-  if((symbol == "BTC-USD" && quantity > 7) || (symbol == "LTC-USD" && quantity > 250)) {
+  if((symbol == "BTC-USD" && quantity > 7) || (symbol == "LTC-USD" && quantity > 350) || (symbol == "ETH-USD" && quantity > 150)) {
     var tickerOptions = {
       uri: `https://api.gdax.com/products/${symbol}/ticker`,
       headers: {

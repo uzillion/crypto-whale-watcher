@@ -25,8 +25,8 @@ const binance = (data) => {
   .then(function (tickerResponse) {
     // console.log(parseFloat(JSON.stringify(tickerResponse.volume)));
     let volume = parseFloat(tickerResponse.volume);
-    // console.log(0.001*volume);
-    if(quantity >= 0.001*volume) {
+    // console.log(0.002*volume);
+    if(quantity >= 0.002*volume) {
       let messageObj = {
         event: "TRADE",
         symbol,
@@ -69,7 +69,7 @@ const bitfinex = (data) => {
     request(tickerOptions)
     .then(function (tickerResponse) {
       let volume = tickerResponse[5];
-      if(Math.abs(quantity) > (0.001*volume)) {
+      if(Math.abs(quantity) > (0.002*volume)) {
         let messageObj = {
           event: "TRADE",
           symbol: "BTCUSD",
@@ -115,8 +115,8 @@ const gdax = (data) => {
     .then(function (tickerResponse) {
       // console.log(tickerResponse);
       let volume = parseFloat(tickerResponse.volume);
-      // console.log(0.001*volume)
-      if(quantity > (0.001*volume)) {
+      // console.log(0.002*volume)
+      if(quantity > (0.002*volume)) {
         let messageObj = {
           event: "TRADE",
           symbol,

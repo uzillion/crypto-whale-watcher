@@ -10,6 +10,7 @@ const binance = (data) => {
   let quantity = parseFloat(trade.q);
   let price = parseFloat(trade.p);
   let symbol = trade.s;
+  let isMaker = trade.m;
   
   if((symbol == "BTCUSDT" && quantity > 7) || (symbol == "EOSBTC" && quantity > 1000)) {
   var tickerOptions = {
@@ -33,6 +34,9 @@ const binance = (data) => {
         price,
         exchange: "Binance"
       }
+
+      if(isMaker)
+        messageObj.quantity *= -1;
       message(messageObj);
     }
   }).catch(function (err) {
@@ -110,7 +114,7 @@ const gdax = (data) => {
     .then(function (tickerResponse) {
       // console.log(tickerResponse);
       let volume = parseFloat(tickerResponse.volume);
-      console.log(0.001*volume)
+      // console.log(0.001*volume)
       if(quantity > (0.001*volume)) {
         let messageObj = {
           event: "TRADE",

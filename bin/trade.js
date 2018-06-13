@@ -94,6 +94,7 @@ const bitfinex = (data) => {
 }
 
 const gdax = (data) => {
+  let isAggregate = false;
   let trade = JSON.parse(data);
   let maker_order_id = trade.maker_order_id;
   let taker_order_id = trade.taker_order_id;
@@ -104,6 +105,7 @@ const gdax = (data) => {
   if((maker_order_id === prev_maker_order_id) || (taker_order_id === prev_taker_order_id)) {
     quantity = quantity + prev_quantity;
     prev_quantity = quantity;
+    isAggregate = true;
   } else if(typeof trade.size !== "undefined") {
     prev_maker_order_id = maker_order_id;
     prev_taker_order_id = taker_order_id;
@@ -129,7 +131,10 @@ const gdax = (data) => {
           symbol,
           quantity,
           price,
-          exchange: "gdax"
+          exchange: "gdax",
+          isAggregate,
+          taker_order_id,
+          maker_order_id
         }
         if(side == "buy")
           messageObj.quantity *= -1;

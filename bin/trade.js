@@ -4,7 +4,8 @@ const message = require('./message');
 let prev_maker_order_id = "";
 let prev_taker_order_id = "";
 let prev_quantity = 0;
-let current_symbol = "";
+
+let channel_pair = {};
 
 const binance = (data) => {
   let trade = JSON.parse(data);
@@ -52,14 +53,14 @@ const bitfinex = (data) => {
   let channel_id = -1;
   if(trade.chanId) {
     channel_id = trade.chanId;
-    current_symbol = trade.pair;
+    channel_pair[channel_id] = trade.pair;
   } else if(typeof trade[0] == "number")
     channel_id = trade[0];
 
   if(trade[2] != undefined) {
   let quantity = trade[2][2];
   let absQuant = Math.abs(quantity);
-  let symbol = current_symbol;
+  let symbol = channel_pair[channel_id];
   if(trade[1] == "tu" && ((symbol == "BTCUSD" && absQuant > 7) || (symbol == "EOSUSD" && absQuant > 1000) 
       || (symbol == "LTCUSD" && absQuant > 350) || (symbol == "ETHUSD" && absQuant > 150))) {
     let price = trade[2][3]
@@ -82,11 +83,11 @@ const bitfinex = (data) => {
           price,
           exchange: "Bitfinex"
         }
-        // message(messageObj);
+        message(messageObj);
       }
       
     }).catch(function (err) {
-      console.log(err);
+      console.log(err.message);
     });
   }
   }
@@ -136,7 +137,7 @@ const gdax = (data) => {
       }
       
     }).catch(function (err) {
-      console.log(err);
+      console.log(err.message);
     });
   }
 }

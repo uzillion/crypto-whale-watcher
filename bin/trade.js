@@ -82,7 +82,7 @@ const bitfinex = (data) => {
           price,
           exchange: "Bitfinex"
         }
-        message(messageObj);
+        // message(messageObj);
       }
       
     }).catch(function (err) {

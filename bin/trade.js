@@ -93,6 +93,7 @@ const gdax = (data) => {
   let quantity = parseFloat(trade.size);
   let price = trade.price;
   let side = trade.side;
+  let symbol = trade.product_id;
   if((maker_order_id === prev_maker_order_id) || (taker_order_id === prev_taker_order_id)) {
     quantity = quantity + prev_quantity;
     prev_quantity = quantity;
@@ -101,15 +102,15 @@ const gdax = (data) => {
     prev_taker_order_id = taker_order_id;
     prev_quantity = quantity;
   }
-  if(quantity > 7) {
+  if((symbol == "BTC-USD" && quantity > 7) || (symbol == "LTC-USD" && quantity > 250)) {
     var tickerOptions = {
-      uri: `https://api.gdax.com/products/BTC-USD/ticker`,
+      uri: `https://api.gdax.com/products/${symbol}/ticker`,
       headers: {
         'User-Agent': 'Request-Promise'
       },
       json: true
     };
-  
+
     request(tickerOptions)
     .then(function (tickerResponse) {
       // console.log(tickerResponse);
@@ -118,7 +119,7 @@ const gdax = (data) => {
       if(quantity > (0.001*volume)) {
         let messageObj = {
           event: "TRADE",
-          symbol: "BTC/USD",
+          symbol,
           quantity,
           price,
           exchange: "gdax"

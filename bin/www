@@ -50,11 +50,13 @@ trade_history.gdax.on('open', () => {
     "type": "subscribe",     
     "product_ids": [         
         "BTC-USD",
+        "LTC-USD"
      ],     
      "channels": ["matches"] 
   }
 
   trade_history.gdax.send(JSON.stringify(request_object))
+
 })
 
 trade_history.gdax.on('message', (data) => {

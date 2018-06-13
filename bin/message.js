@@ -1,4 +1,17 @@
 const request = require('request-promise-native');
+let prev_msg_id = 0;
+let prev_to_id = "";
+let prev_mo_id = "";
+let prev_quantity = 0;
+
+const sendMessage = (chatOptions) => {
+  return request(chatOptions)
+    .then(function (res) {
+        return res;
+    }).catch(function (err) {
+      console.log(JSON.stringify(err.body));
+    });
+}
 
 const build = (messageObj) => {
   let event = messageObj.event;
@@ -40,14 +53,29 @@ const build = (messageObj) => {
     },
     json: true
   };
-  
-  request(chatOptions)
-    .then(function (res) {
-        console.log(res.result.text+" sent");
-    })
-    .catch(function (err) {
-      console.log(JSON.stringify(err.body));
-    });
+
+  if(to_id == prev_to_id || mo_id == prev_mo_id) {
+    if(quantity > prev_quantity) {
+      chatOptions.uri = `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/editMessageText?chat_id=-1001236925237&message_id=${prev_msg_id}&text=${encoded_message}`;
+      sendMessage(chatOptions)
+        .then((res) => {
+          if(res.ok) {
+            prev_quantity = quantity;
+            prev_msg_id = res.result.message_id;
+            console.log(res.result.text+" sent");
+          }
+        });
+    }
+  } else {
+    sendMessage(chatOptions)
+      .then((res) => {
+        if(res.ok) {
+          prev_quantity = quantity;
+          prev_msg_id = res.result.message_id;
+          console.log(res.result.text+" sent");
+        }
+      });
+  }
 }
 
 module.exports = build;

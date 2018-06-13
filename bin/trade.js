@@ -42,7 +42,7 @@ const binance = (data) => {
       message(messageObj);
     }
   }).catch(function (err) {
-    console.log("Could not get volume");
+    console.log("binance:", err.message);
   });
   }
   // console.log(parseFloat(trade.q));
@@ -87,7 +87,7 @@ const bitfinex = (data) => {
       }
       
     }).catch(function (err) {
-      console.log(err.message);
+      console.log("bitfinex:", err.message);
     });
   }
   }
@@ -142,7 +142,7 @@ const gdax = (data) => {
       }
       
     }).catch(function (err) {
-      console.log(err.message);
+      console.log("gdax", err.message);
     });
   }
 }

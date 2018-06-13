@@ -119,7 +119,7 @@ const gdax = (data) => {
           price,
           exchange: "gdax"
         }
-        if(side == "sell")
+        if(side == "buy")
           messageObj.quantity *= -1;
         message(messageObj);
       }

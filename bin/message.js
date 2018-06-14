@@ -59,22 +59,23 @@ const build = (messageObj) => {
       chatOptions.uri = `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/editMessageText?chat_id=-1001236925237&message_id=${prev_msg_id}&text=${encoded_message}`;
       sendMessage(chatOptions)
         .then((res) => {
-          if(res.ok) {
-            prev_quantity = quantity;
-            prev_msg_id = res.result.message_id;
-            console.log(res.result.text+" sent");
-          }
-        });
+          prev_msg_id = res.result.message_id;
+          prev_quantity = quantity;
+          console.log(res.result.text+" updated");
+        }).catch((err) => {console.log(err.message)});
     }
   } else {
     sendMessage(chatOptions)
       .then((res) => {
-        if(res.ok) {
-          prev_quantity = quantity;
-          prev_msg_id = res.result.message_id;
-          console.log(res.result.text+" sent");
-        }
+        prev_msg_id = res.result.message_id;
+        prev_quantity = quantity;
+        console.log(res.result.text+" sent");
       });
+  }
+
+  if(to_id != undefined && mo_id != undefined) {
+    prev_to_id = to_id;
+    prev_mo_id = mo_id;
   }
 }
 

@@ -8,8 +8,9 @@ var app = require('../app');
 var debug = require('debug')('whale-tracker:server');
 var http = require('http');
 
-const trade = require('./trade');
 const WebSocket = require('ws');
+const trade = require('./trade');
+const wall = require('./wall');
 
 const trade_history = {
   btc_binance: new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade'),
@@ -29,7 +30,8 @@ setInterval(refreshStream, 72000000);
 
 
 trade_history.btc_binance.on('message', function incoming(data) {
-  trade.binance(data);
+  let obj = JSON.parse(data);
+  trade.binance(obj);
 });
 
 trade_history.bitfinex.on('open', () => {
@@ -53,7 +55,8 @@ trade_history.bitfinex.on('open', () => {
 });
 
 trade_history.bitfinex.on('message', (data) => {
-  trade.bitfinex(data);
+  let obj = JSON.parse(data);
+  trade.bitfinex(obj);
 })
 
 
@@ -70,10 +73,16 @@ trade_history.gdax.on('open', () => {
 
   trade_history.gdax.send(JSON.stringify(request_object))
 
-})
+  request_object.channels = ["level2"];
+  trade_history.gdax.send(JSON.stringify(request_object))
+});
 
 trade_history.gdax.on('message', (data) => {
-  trade.gdax(data);
+  let obj = JSON.parse(data);
+  if(obj.type == "last_match" || obj.type == "match")
+    trade.gdax(obj);
+  // else if(obj.type == "l2update")
+    // wall.gdax(obj);
 })
 
 

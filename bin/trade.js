@@ -1,6 +1,8 @@
 const request = require('request-promise-native');
 const message = require('./message');
 
+const alerts = true;
+
 let exchange_volumes = {
   binance: {},
   bitfinex: {},
@@ -15,11 +17,14 @@ let tickerOptions = {
   json: true
 };
 
-const min_size = {
-  "USD": 20,
+let min_quant = {
+  "BTC": 10,
   "ETH": 200,
-  "EOS": 3000
+  "EOS": 3000,
+  "LTC": 450
 }
+
+let portion_size = 0.001;
 
 const refresh_volumes = () => {
   ["BTCUSDT", "EOSUSDT", "ETHUSDT"].forEach((symbol) => {
@@ -69,8 +74,9 @@ const binance = (trade) => {
   let price = parseFloat(trade.p);
   let symbol = trade.s;
   let isMaker = trade.m;
-  
-  if((symbol == "BTCUSDT" && quantity > 8) || (symbol == "EOSUSDT" && quantity > 3000) || (symbol == "ETHUSDT" && quantity > 150)) {
+  let currency = symbol.substring(0, 3);
+  if(quantity > min_quant[currency]) {  
+  // if((symbol == "BTCUSDT" && quantity > 8) || (symbol == "EOSUSDT" && quantity > 3000) || (symbol == "ETHUSDT" && quantity > 150)) {
     let volume = exchange_volumes.binance[symbol];
     let messageObj = {
       event: "TRADE",
@@ -83,7 +89,7 @@ const binance = (trade) => {
     if(isMaker)
     messageObj.quantity *= -1;
     
-    if(quantity >= 0.002*volume) {
+    if(quantity >= portion_size*volume && alerts) {
       message(messageObj);
     }
   }
@@ -102,8 +108,8 @@ const bitfinex = (trade) => {
     let quantity = trade[2][2];
     let absQuant = Math.abs(quantity);
     let symbol = channel_pair[channel_id];
-    if(trade[1] == "tu" && ((symbol == "BTCUSD" && absQuant > 7) || (symbol == "EOSUSD" && absQuant > 3000) 
-    || (symbol == "LTCUSD" && absQuant > 450) || (symbol == "ETHUSD" && absQuant > 150))) {
+    let currency = symbol.substring(0, 3);
+    if(trade[1] == "tu" && (quantity > min_quant[currency])) {
       let volume = exchange_volumes.bitfinex[symbol];
       let price = trade[2][3]
       let messageObj = {
@@ -113,7 +119,7 @@ const bitfinex = (trade) => {
         price,
         exchange: "Bitfinex"
       }
-      if(absQuant >= 0.002*volume) {
+      if(absQuant >= portion_size*volume && alerts) {
         message(messageObj);
       }
     }
@@ -128,6 +134,7 @@ const gdax = (trade) => {
   let price = trade.price;
   let side = trade.side;
   let symbol = trade.product_id;
+  let currency = symbol.substring(0, 3);
   if((maker_order_id === prev_maker_order_id) || (taker_order_id === prev_taker_order_id)) {
     quantity = quantity + prev_quantity;
     prev_quantity = quantity;
@@ -137,7 +144,7 @@ const gdax = (trade) => {
     prev_taker_order_id = taker_order_id;
     prev_quantity = quantity;
   }
-  if((symbol == "BTC-USD" && quantity > 7) || (symbol == "LTC-USD" && quantity > 450) || (symbol == "ETH-USD" && quantity > 150)) {
+  if(quantity > min_quant[currency]) {
     let volume = exchange_volumes.gdax[symbol];
     let messageObj = {
       event: "TRADE",
@@ -152,9 +159,9 @@ const gdax = (trade) => {
     if(side == "buy")
     messageObj.quantity *= -1;
     
-    if(quantity >= 0.002*volume) {
+    if(quantity >= portion_size*volume && alerts) {
       message(messageObj);
     }
   }
 }
-module.exports = {binance, bitfinex, gdax};
+module.exports = {binance, bitfinex, gdax, min_quant, portion_size};

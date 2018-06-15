@@ -17,11 +17,11 @@ let tickerOptions = {
   json: true
 };
 
-let min_quant = {
-  "BTC": 10,
-  "ETH": 200,
-  "EOS": 3000,
-  "LTC": 450
+let min_cost = {
+  "BTC": 50000,
+  "ETH": 50000,
+  "EOS": 40000,
+  "LTC": 50000
 }
 
 let portion_size = 0.001;
@@ -75,8 +75,8 @@ const binance = (trade) => {
   let symbol = trade.s;
   let isMaker = trade.m;
   let currency = symbol.substring(0, 3);
-  if(quantity > min_quant[currency]) {  
-  // if((symbol == "BTCUSDT" && quantity > 8) || (symbol == "EOSUSDT" && quantity > 3000) || (symbol == "ETHUSDT" && quantity > 150)) {
+  if(quantity*price > min_cost[currency]) {  
+  // if((symbol == "BTCUSDT" && quantity*price > 8) || (symbol == "EOSUSDT" && quantity*price > 3000) || (symbol == "ETHUSDT" && quantity*price > 150)) {
     let volume = exchange_volumes.binance[symbol];
     let messageObj = {
       event: "TRADE",
@@ -89,7 +89,7 @@ const binance = (trade) => {
     if(isMaker)
     messageObj.quantity *= -1;
     
-    if(quantity >= portion_size*volume && alerts) {
+    if(quantity*price >= portion_size*volume && alerts) {
       message(messageObj);
     }
   }
@@ -109,9 +109,9 @@ const bitfinex = (trade) => {
     let absQuant = Math.abs(quantity);
     let symbol = channel_pair[channel_id];
     let currency = symbol.substring(0, 3);
-    if(trade[1] == "tu" && (quantity > min_quant[currency])) {
+    let price = trade[2][3]
+    if(trade[1] == "tu" && (absQuant*price > min_cost[currency])) {
       let volume = exchange_volumes.bitfinex[symbol];
-      let price = trade[2][3]
       let messageObj = {
         event: "TRADE",
         symbol,
@@ -144,7 +144,7 @@ const gdax = (trade) => {
     prev_taker_order_id = taker_order_id;
     prev_quantity = quantity;
   }
-  if(quantity > min_quant[currency]) {
+  if(quantity*price > min_cost[currency]) {
     let volume = exchange_volumes.gdax[symbol];
     let messageObj = {
       event: "TRADE",
@@ -159,9 +159,9 @@ const gdax = (trade) => {
     if(side == "buy")
     messageObj.quantity *= -1;
     
-    if(quantity >= portion_size*volume && alerts) {
+    if(quantity*price >= portion_size*volume && alerts) {
       message(messageObj);
     }
   }
 }
-module.exports = {binance, bitfinex, gdax, min_quant, portion_size};
+module.exports = {binance, bitfinex, gdax, min_cost, portion_size};

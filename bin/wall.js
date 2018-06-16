@@ -1,31 +1,47 @@
-const request = require('request-promise-native');
 const message = require('./message');
 const volumes = require('./volume').exchange_volumes;
 
 let channel_pair = {};
 
-let sell_total = 0;
-let buy_total = 0;
+let sell_total = {
+  "bitfinex": {
+  }
+};
+let buy_total = {
+  "bitfinex": {
+  }
+};
+
+let wall = {
+  "bitfinex": {
+  }
+}
 
 let book = {};
 
-const alerts = false;
+const alerts = true;
 
-let sensitivity = 6;
+let sensitivity = 3;
 
 let min_worth = {
-  "BTC": 100,
-  "ETH": 1300,
-  "EOS": 60000,
-  "LTC": 6000
+  "BTC": 1000000,
+  "ETH": 1000000,
+  "EOS": 1000000,
+  "LTC": 1000000
 }
 
 const updateBook = (channel_id, option) => {
+  // sell_total = 0;
+  // buy_total = 0;
+  if(buy_total.bitfinex[channel_id] == undefined)
+  buy_total.bitfinex[channel_id] = 0;
+  if(sell_total.bitfinex[channel_id] == undefined)
+  sell_total.bitfinex[channel_id] = 0;
   book[channel_id].forEach((pricePoint) => {
     if(pricePoint[2] > 0 && option != "sell") {
-      buy_total += pricePoint[2];
-    } else if(option != "buy") {
-      sell_total += Math.abs(pricePoint[2]);
+      buy_total.bitfinex[channel_id] += pricePoint[2];
+    } else if(pricePoint[2] < 0 && option != "buy") {
+      sell_total.bitfinex[channel_id] += Math.abs(pricePoint[2]);
     }
   })
 }
@@ -49,42 +65,76 @@ const bitfinex = (order) => {
       let index = book[channel_id].findIndex(x => x[0] == price);
       if(count > 0) {
         if(index != -1) {
+          if(book[channel_id][index][2] > 0)
+          buy_total.bitfinex[channel_id] -= book[channel_id][index][2];
+          else
+          sell_total.bitfinex[channel_id] += book[channel_id][index][2];
           book[channel_id][index] = [price, count, quantity];
-          quantity > 0 ? updateBook(channel_id, "buy") : updateBook(channel_id, "sell");
         } else {
+          // console.log(price, count, quantity);
           book[channel_id].push([price, count, quantity]);
         }
-      } else {
-        quantity > 0 ? updateBook(channel_id, "buy") : updateBook(channel_id, "sell");
+        if(quantity > 0)
+        buy_total.bitfinex[channel_id] += quantity;
+        else
+        sell_total.bitfinex[channel_id] += absQuant;
+      } 
+      else if(count == 0 && index != -1) {
+        if(book[channel_id][index][2] > 0)
+        buy_total.bitfinex[channel_id] -= book[channel_id][index][2];
+        else
+        sell_total.bitfinex[channel_id] += book[channel_id][index][2];
         book[channel_id].splice(index, 1);
       }
-      if((sell_total*price > min_worth[currency]) || (buy_total*price > min_worth[currency])) {
-        console.log(sell_total, buy_total);
-        let sb_ratio = sell_total/buy_total;
-        let volume = volumes.bitfinex[symbol];
+      // quantity > 0 ? updateBook(channel_id, "buy") : updateBook(channel_id, "sell");
+      // updateBook(channel_id);
+      let s_total = sell_total.bitfinex[channel_id];
+      let b_total = buy_total.bitfinex[channel_id];
+      if((s_total*price > min_worth[currency]) || (b_total*price > min_worth[currency])) {
+        let sb_ratio = s_total/b_total;
+        // console.log(symbol, s_total, b_total);
+        // let volume = volumes.bitfinex[symbol];
         let messageObj = {
           event: "WALL",
           side: "",
           symbol,
           size: 0,
-          price,
           exchange: "Bitfinex"
         }
-        if(sb_ratio > sensitivity && alerts) {
-          messageObj.side = "sell";
+        if(sb_ratio > sensitivity && alerts && !wall.bitfinex[channel_id].sell) {
+          // console.log(book[channel_id]);
+          // console.log("sell:", symbol, sb_ratio, s_total+"/"+b_total);
+          messageObj.side = "Sell";
           messageObj.size = sb_ratio;
+          wall.bitfinex[channel_id] = {
+            sell: true,
+            buy: false
+          };
           message(messageObj);
         }
-        else if((1/sb_ratio) > sensitivity && alerts) {
-          messageObj.side = "buy";
+        else if((1/sb_ratio) > sensitivity && alerts && !wall.bitfinex[channel_id].buy) {
+          // console.log(book[channel_id]);
+          // console.log("buy:",symbol, 1/sb_ratio, s_total+"/"+b_total);
+          messageObj.side = "Buy";
           messageObj.size = 1/sb_ratio;
+          wall.bitfinex[channel_id] = {
+            sell: false,
+            buy: true
+          };
           message(messageObj);
-        }
+        } 
+        if(sb_ratio < sensitivity && sb_ratio >= 1)
+        wall.bitfinex[channel_id].sell = false;
+        if(1/sb_ratio < sensitivity && 1/sb_ratio >= 1)
+        wall.bitfinex[channel_id].buy = false; 
       }
-      // Problem: Finding the best way to correlate the huge influx of orders with the number of orders
-    } else if(order[1][0][0] != undefined) {
+    } else if(typeof order[1] != "string" && order[1][0][0] != undefined) {
       book[channel_id] = order[1];
-      
+      wall.bitfinex[channel_id] = {
+        sell: false,
+        buy: false
+      };
+      updateBook(channel_id);
     }
   }
   

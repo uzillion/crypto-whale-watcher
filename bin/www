@@ -44,10 +44,10 @@ trade_history.bitfinex.on('open', () => {
     symbol: "" 
   }
 
-  // symbols.forEach(symbol => {
-  //   request_object.symbol = symbol;
-  //   trade_history.bitfinex.send(JSON.stringify(request_object))
-  // });
+  symbols.forEach(symbol => {
+    request_object.symbol = symbol;
+    trade_history.bitfinex.send(JSON.stringify(request_object))
+  });
 
   request_object = { 
     event: "subscribe", 
@@ -55,23 +55,13 @@ trade_history.bitfinex.on('open', () => {
     symbol: "",
     prec: "P1",
     freq: "F1",
-    len: "25"  
+    len: "30"  
   }
 
   symbols.forEach(symbol => {
     request_object.symbol = symbol;
     trade_history.bitfinex.send(JSON.stringify(request_object))
   });
-  // request_object.symbol = "EOSUSD";
-  // trade_history.bitfinex.send(JSON.stringify(request_object))
-
-  // request_object.symbol = "LTCUSD";
-  // trade_history.bitfinex.send(JSON.stringify(request_object))
-
-  // request_object.symbol = "ETHUSD";
-  // trade_history.bitfinex.send(JSON.stringify(request_object))
-
-
 
 });
 

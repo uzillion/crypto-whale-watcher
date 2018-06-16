@@ -1,8 +1,7 @@
-const request = require('request-promise-native');
 const message = require('./message');
-const volumes = require('./volume').volumes;
+const volumes = require('./volume').exchange_volumes;
 
-const alerts = false;
+const alerts = true;
 
 let min_cost = {
   "BTC": 50000,

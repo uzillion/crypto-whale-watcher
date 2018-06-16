@@ -35,28 +35,52 @@ trade_history.btc_binance.on('message', function incoming(data) {
 });
 
 trade_history.bitfinex.on('open', () => {
+
+  const symbols = ["BTCUSD", "EOSUSD", "LTCUSD", "ETHUSD"]
+
   let request_object = { 
     event: "subscribe", 
     channel: "trades", 
-    symbol: "BTCUSD" 
+    symbol: "" 
   }
-  trade_history.bitfinex.send(JSON.stringify(request_object))
 
-  request_object.symbol = "EOSUSD";
-  trade_history.bitfinex.send(JSON.stringify(request_object))
+  // symbols.forEach(symbol => {
+  //   request_object.symbol = symbol;
+  //   trade_history.bitfinex.send(JSON.stringify(request_object))
+  // });
 
-  request_object.symbol = "LTCUSD";
-  trade_history.bitfinex.send(JSON.stringify(request_object))
+  request_object = { 
+    event: "subscribe", 
+    channel: "book", 
+    symbol: "",
+    prec: "P1",
+    freq: "F1",
+    len: "25"  
+  }
 
-  request_object.symbol = "ETHUSD";
-  trade_history.bitfinex.send(JSON.stringify(request_object))
+  symbols.forEach(symbol => {
+    request_object.symbol = symbol;
+    trade_history.bitfinex.send(JSON.stringify(request_object))
+  });
+  // request_object.symbol = "EOSUSD";
+  // trade_history.bitfinex.send(JSON.stringify(request_object))
+
+  // request_object.symbol = "LTCUSD";
+  // trade_history.bitfinex.send(JSON.stringify(request_object))
+
+  // request_object.symbol = "ETHUSD";
+  // trade_history.bitfinex.send(JSON.stringify(request_object))
+
 
 
 });
 
 trade_history.bitfinex.on('message', (data) => {
   let obj = JSON.parse(data);
-  trade.bitfinex(obj);
+  if(obj.channel == "trades" || obj[2] != undefined)
+    trade.bitfinex(obj);
+  else if(obj.event != "info")
+    wall.bitfinex(obj);
 })
 
 

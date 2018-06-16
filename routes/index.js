@@ -8,13 +8,13 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-  if(req.body.btc > 7)
+  if(req.body.btc > 35000)
     trade.min_cost["BTC"] = req.body.btc;
-  if(req.body.ltc > 350)
+  if(req.body.ltc > 35000)
     trade.min_cost["LTC"] = req.body.ltc;
-  if(req.body.eos > 3000)
+  if(req.body.eos > 35000)
     trade.min_cost["EOS"] = req.body.eos;
-  if(req.body.eth > 100)
+  if(req.body.eth > 35000)
     trade.min_cost["ETH"] = req.body.eth;
 
   trade.portion_size = req.body.portion / 100;

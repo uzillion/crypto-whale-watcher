@@ -42,19 +42,28 @@ const build = (messageObj) => {
     special_msg = order_ids + aggr_msg;
   }
   
-  if(event == "WALL") {
+  if(event == "VOLUME") {
+    
     let side = messageObj.side;
     let size = Math.round(messageObj.size);
-    encoded_message = encodeURIComponent(`${event}:\n${symbol} (${exchange})\n${side} wall is around ${size} times bigger than counterpart`);
+    encoded_message = encodeURIComponent(`*VOLUME:*\n${symbol} (${exchange})\n${side} volume is of ${quantity}, which is around ${size} times bigger than counterpart`);
+
   }
   else if(event == "TRADE") {
     if(quantity < 0)
-      encoded_message = encodeURIComponent(`${event}:\n${symbol} (${exchange})\nSold ${quantity*-1} at $${price}${special_msg}`);
+      encoded_message = encodeURIComponent(`*TRADE:*\n${symbol} (${exchange})\nSold ${quantity*-1} at $${price}${special_msg}`);
     else
-      encoded_message = encodeURIComponent(`${event}:\n${symbol} (${exchange})\nBought ${quantity} at $${price}${special_msg}`);
+      encoded_message = encodeURIComponent(`*TRADE:*\n${symbol} (${exchange})\nBought ${quantity} at $${price}${special_msg}`);
+  }
+  else if(event == "limit-change") {
+    encoded_message = encodeURIComponent('*Limit change requested.*');
+  } 
+  else if(event == "WD") {
+    let side = messageObj.side;
+    encoded_message = encodeURIComponent(`*VOLUME:*\n${symbol} (${exchange})\n${side} volume is down compared to before`);
   }
   var chatOptions = {
-    uri: `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/sendMessage?chat_id=-1001236925237&text=${encoded_message}`,
+    uri: `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/sendMessage?parse_mode=Markdown&chat_id=-1001236925237&text=${encoded_message}`,
     headers: {
       'User-Agent': 'Request-Promise'
     },
@@ -63,20 +72,21 @@ const build = (messageObj) => {
   
   if(to_id == prev_to_id || mo_id == prev_mo_id) {
     if(quantity > prev_quantity) {
-      chatOptions.uri = `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/editMessageText?chat_id=-1001236925237&message_id=${prev_msg_id}&text=${encoded_message}`;
+      chatOptions.uri = `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/editMessageText?parse_mode=Markdown&chat_id=-1001236925237&message_id=${prev_msg_id}&text=${encoded_message}`;
       sendMessage(chatOptions)
       .then((res) => {
         prev_msg_id = res.result.message_id;
         prev_quantity = quantity;
-        console.log(res.result.text+" updated");
+        // console.log(res.result.text+" updated");
       }).catch((err) => {console.log(err.message)});
     }
   } else {
+    console.log(encoded_message);
     sendMessage(chatOptions)
     .then((res) => {
       prev_msg_id = res.result.message_id;
       prev_quantity = quantity;
-      console.log(res.result.text+" sent");
+      // console.log(res.result.text+" sent");
     });
   }
   

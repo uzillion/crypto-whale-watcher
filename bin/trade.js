@@ -4,13 +4,13 @@ const volumes = require('./volume').exchange_volumes;
 const alerts = true;
 
 let min_cost = {
-  "BTC": 50000,
-  "ETH": 50000,
-  "EOS": 40000,
+  "BTC": 70000,
+  "ETH": 70000,
+  "EOS": 50000,
   "LTC": 50000
 }
 
-let portion_size = 0.001;
+let portion_size = 0.000; // Recommended value = 0.001
 
 let prev_maker_order_id = "";
 let prev_taker_order_id = "";

@@ -12,30 +12,32 @@ const WebSocket = require('ws');
 const trade = require('./trade');
 const wall = require('./wall');
 
-const trade_history = {
-  btc_binance: new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade'),
-  eos_binance: new WebSocket('wss://stream.binance.com:9443/ws/eosusdt@aggTrade'),
-  eth_binance: new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@aggTrade'),
+
+let sockets = {
+  binance: new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@aggTrade/eosusdt@aggTrade/ethusdt@aggTrade/btcusdt@depth/eosusdt@depth/ethusdt@depth'),
   bitfinex: new WebSocket('wss://api.bitfinex.com/ws/2'),
   gdax: new WebSocket('wss://ws-feed.gdax.com')
-};
+}
+
+// sockets.binance.close();
+// sockets.bitfinex.close();
+// soclets.gdax.close();
 
 const refreshStream = () => {
-  trade_history.btc_binance = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@aggTrade');
-  trade_history.eos_binance = new WebSocket('wss://stream.binance.com:9443/ws/eosusdt@aggTrade');
-  trade_history.eth_binance = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@aggTrade');
+  sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@aggTrade/eosusdt@aggTrade/ethusdt@aggTrade/btcusdt@depth/eosusdt@depth/ethusdt@depth');
 }
 
 setInterval(refreshStream, 72000000);
 
-
-trade_history.btc_binance.on('message', function incoming(data) {
-  let obj = JSON.parse(data);
-  trade.binance(obj);
+sockets.binance.on('message', function incoming(data) {
+  let obj = JSON.parse(data).data;
+  if(obj.e == "aggTrade")
+    trade.binance(obj);
+  else if(obj.e == "depthUpdate")
+    wall.binance(obj);
 });
 
-trade_history.bitfinex.on('open', () => {
-
+sockets.bitfinex.on('open', () => {
   const symbols = ["BTCUSD", "EOSUSD", "LTCUSD", "ETHUSD"]
 
   let request_object = { 
@@ -46,7 +48,7 @@ trade_history.bitfinex.on('open', () => {
 
   symbols.forEach(symbol => {
     request_object.symbol = symbol;
-    trade_history.bitfinex.send(JSON.stringify(request_object))
+    sockets.bitfinex.send(JSON.stringify(request_object))
   });
 
   request_object = { 
@@ -55,26 +57,27 @@ trade_history.bitfinex.on('open', () => {
     symbol: "",
     prec: "P1",
     freq: "F1",
-    len: "30"  
+    length: "25"  
   }
 
   symbols.forEach(symbol => {
     request_object.symbol = symbol;
-    trade_history.bitfinex.send(JSON.stringify(request_object))
+    sockets.bitfinex.send(JSON.stringify(request_object))
   });
 
 });
 
-trade_history.bitfinex.on('message', (data) => {
+sockets.bitfinex.on('message', (data) => {
   let obj = JSON.parse(data);
   if(obj.channel == "trades" || obj[2] != undefined)
     trade.bitfinex(obj);
-  else if(obj.event != "info")
+  else if(obj.event != "info") {
     wall.bitfinex(obj);
+  }
 })
 
 
-trade_history.gdax.on('open', () => {
+sockets.gdax.on('open', () => {
   let request_object = {     
     "type": "subscribe",     
     "product_ids": [         
@@ -85,13 +88,13 @@ trade_history.gdax.on('open', () => {
      "channels": ["matches"] 
   }
 
-  trade_history.gdax.send(JSON.stringify(request_object))
+  sockets.gdax.send(JSON.stringify(request_object))
 
   request_object.channels = ["level2"];
-  trade_history.gdax.send(JSON.stringify(request_object))
+  sockets.gdax.send(JSON.stringify(request_object))
 });
 
-trade_history.gdax.on('message', (data) => {
+sockets.gdax.on('message', (data) => {
   let obj = JSON.parse(data);
   if(obj.type == "last_match" || obj.type == "match")
     trade.gdax(obj);

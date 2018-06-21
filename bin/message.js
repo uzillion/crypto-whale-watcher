@@ -3,13 +3,14 @@ let prev_msg_id = 0;
 let prev_to_id = "";
 let prev_mo_id = "";
 let prev_quantity = 0;
+let test = false;
+
+let CHAT_ID = "-1001236925237";
 
 const sendMessage = (chatOptions) => {
   return request(chatOptions)
-  .then(function (res) {
-    return res;
-  }).catch(function (err) {
-    console.log(JSON.stringify(err.body));
+  .catch(function (err) {
+    console.log("Main:", err.message);
   });
 }
 
@@ -19,8 +20,8 @@ const build = (messageObj) => {
   let quantity = messageObj.quantity;
   let price = messageObj.price;
   let exchange = messageObj.exchange;
-  let to_id = messageObj.taker_order_id;
-  let mo_id = messageObj.maker_order_id;
+  let to_id = undefined;
+  let mo_id = undefined;
   let isAggregate = messageObj.isAggregate;
   let encoded_message = "";
   let aggr_msg = "";
@@ -28,6 +29,8 @@ const build = (messageObj) => {
   let special_msg = "";
   
   if(exchange == 'gdax') {
+    to_id = messageObj.taker_order_id;
+    mo_id = messageObj.maker_order_id;
     let taker = "";
     let maker = "";
     if(quantity < 0) {
@@ -37,7 +40,7 @@ const build = (messageObj) => {
       taker = "buyer";
       maker = "seller";
     }
-    order_ids = `\n${taker}_order_Id: ${to_id.substring(to_id.length - 4)}\n${maker}_order_Id: ${mo_id.substring(mo_id.length - 4)}`;
+    order_ids = `\n${taker}-orderId: ${to_id.substring(to_id.length - 4)}\n${maker}-orderId: ${mo_id.substring(mo_id.length - 4)}`;
     aggr_msg = isAggregate?"\n**Aggregated**":"";
     special_msg = order_ids + aggr_msg;
   }
@@ -62,8 +65,12 @@ const build = (messageObj) => {
     let side = messageObj.side;
     encoded_message = encodeURIComponent(`*VOLUME:*\n${symbol} (${exchange})\n${side} volume is down compared to before`);
   }
+  
+  if(test)
+    CHAT_ID = "-1001231773685";
+
   var chatOptions = {
-    uri: `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/sendMessage?parse_mode=Markdown&chat_id=-1001236925237&text=${encoded_message}`,
+    uri: `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/sendMessage?parse_mode=Markdown&chat_id=${CHAT_ID}&text=${encoded_message}`,
     headers: {
       'User-Agent': 'Request-Promise'
     },
@@ -72,20 +79,29 @@ const build = (messageObj) => {
   
   if(to_id == prev_to_id || mo_id == prev_mo_id) {
     if(quantity > prev_quantity) {
-      chatOptions.uri = `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/editMessageText?parse_mode=Markdown&chat_id=-1001236925237&message_id=${prev_msg_id}&text=${encoded_message}`;
+      chatOptions.uri = `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/editMessageText?parse_mode=Markdown&chat_id=${CHAT_ID}&message_id=${prev_msg_id}&text=${encoded_message}`;
       sendMessage(chatOptions)
       .then((res) => {
-        prev_msg_id = res.result.message_id;
-        prev_quantity = quantity;
+        // console.log("This is res:", res);
+        if(res.ok) {
+          prev_msg_id = res.result.message_id;
+          prev_quantity = quantity;
+        } else {
+          console.log("Message update failed");
+        }
         // console.log(res.result.text+" updated");
-      }).catch((err) => {console.log(err.message)});
+      });
     }
   } else {
-    console.log(encoded_message);
+    // console.log(encoded_message);
     sendMessage(chatOptions)
     .then((res) => {
-      prev_msg_id = res.result.message_id;
-      prev_quantity = quantity;
+      if(res.ok) {
+        prev_msg_id = res.result.message_id;
+        prev_quantity = quantity;
+      } else {
+        console.log("Message sending failed");
+      }
       // console.log(res.result.text+" sent");
     });
   }

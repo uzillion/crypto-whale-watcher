@@ -12,10 +12,10 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h3 style="text-align: center">Min Limits</h3>
+        <h3 style="text-align: center"><strong>Trade Min-Worth Limits</strong></h3>
       </div>
     </div>
-    <div class="row d-block" style="margin-top: 40px">
+    <div class="row" style="margin-top: 40px">
       <form class="form-inline" action="/" method="POST">
         <div class="col-lg-3 col-md-6 mx-auto">
           <div class="input-group">
@@ -62,19 +62,84 @@
           </div>
         </div>
       </div>
-      <div class="row d-block" style="margin-top: 40px">
+      <div class="row" style="margin-top: 40px">
         <div class="col-12 mx-auto" style="padding-left: 39%">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text"><stong>Volume Filter</stong></span>
-        </div>
-        <input class="form-control" type="number" style="max-width: 100px" step="0.1" name="portion" value="<%=portion * 100%>">
-        <div class="input-group-append">
-          <span class="input-group-text">%</span>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><stong>Volume Filter</stong></span>
+            </div>
+            <input class="form-control" type="number" style="max-width: 100px" step="0.1" name="portion" value="<%=portion * 100%>">
+            <div class="input-group-append">
+              <span class="input-group-text">%</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+
+      <hr>
+      
+      <div class="row">
+        <div class="col-12">
+          <h3 style="text-align: center; margin-top: 30px;"><strong>Volume Min-Worth Limits</strong></h3>
+        </div>
+      </div>
+      <div class="row" style="margin-top: 40px">
+        <form class="form-inline" action="/" method="POST">
+          <div class="col-lg-3 col-md-6 mx-auto">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><strong>BTC</strong></span>
+              </div>
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+              <input class="form-control" name="btc_vol" type="number" value="<%=vol.BTC%>">
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 mx-auto">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><strong>LTC</strong></span>
+              </div>
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+              <input class="form-control" name="ltc_vol" type="number" value="<%=vol.LTC%>">
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 mx-auto">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><strong>ETH</strong></span>
+              </div>
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+              <input class="form-control" name="eth_vol" type="number" value="<%=vol.ETH%>">
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 mx-auto">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><strong>EOS</strong></span>
+              </div>
+              <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+              </div>
+              <input class="form-control" name="eos_vol" type="number" value="<%=vol.EOS%>">
+            </div>
+          </div>
+        </div>
+        <div class="row" style="margin-top: 40px">
+          <div class="col-12 mx-auto" style="padding-left: 39%">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><stong>Min Ratio</stong></span>
+              </div>
+              <input class="form-control" type="number" style="max-width: 100px" step="0.1" name="ratio" value="<%=vol_ratio%>">
+            </div>
+          </div>
+        </div>
       <input class="btn btn-primary" style="margin: 4% auto auto 48%" type="submit" value="submit">
     </form>
     

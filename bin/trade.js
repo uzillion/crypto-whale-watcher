@@ -5,9 +5,9 @@ const alerts = true;
 
 let min_cost = {
   "BTC": 70000,
-  "ETH": 70000,
+  "ETH": 60000,
   "EOS": 50000,
-  "LTC": 50000
+  "LTC": 40000
 }
 
 let portion_size = 0.000; // Recommended value = 0.001

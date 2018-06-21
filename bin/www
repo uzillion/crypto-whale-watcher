@@ -55,7 +55,7 @@ sockets.bitfinex.on('open', () => {
     event: "subscribe", 
     channel: "book", 
     symbol: "",
-    prec: "P1",
+    prec: "P0",
     freq: "F1",
     length: "25"  
   }

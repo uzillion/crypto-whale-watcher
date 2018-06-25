@@ -1,16 +1,25 @@
+/**
+ * Responsible for handling trade streams from different exchanges.
+ * The trade streams are constantly gone through to check for big trades.
+ * If a trade meets the condition for being counted as a big trade, it is forwarded to messaging function for alerting the user.
+ */
+
 const message = require('./message');
 const volumes = require('./volume').exchange_volumes;
+const alerts = require('../config').trade.alerts;
 
-const alerts = true;
+const trade = require('../db/trade');
 
-let min_cost = {
-  "BTC": 70000,
-  "ETH": 60000,
-  "EOS": 50000,
-  "LTC": 40000
-}
+let min_cost = trade.getMinWorth();
 
-let portion_size = 0.000; // Recommended value = 0.001
+// let min_cost = {
+//   "BTC": 70000,
+//   "ETH": 60000,
+//   "EOS": 50000,
+//   "LTC": 40000
+// }
+
+let volume_filter = trade.getVolFilter() / 100; // Recommended value = 0.001
 
 let prev_maker_order_id = "";
 let prev_taker_order_id = "";
@@ -24,8 +33,8 @@ const binance = (trade) => {
   let symbol = trade.s;
   let isMaker = trade.m;
   let currency = symbol.substring(0, 3);
+
   if(quantity*price > min_cost[currency]) {  
-  // if((symbol == "BTCUSDT" && quantity*price > 8) || (symbol == "EOSUSDT" && quantity*price > 3000) || (symbol == "ETHUSDT" && quantity*price > 150)) {
     let volume = volumes.binance[symbol];
     let messageObj = {
       event: "TRADE",
@@ -38,7 +47,7 @@ const binance = (trade) => {
     if(isMaker)
     messageObj.quantity *= -1;
     
-    if(quantity*price >= portion_size*volume && alerts) {
+    if(quantity*price >= volume_filter*volume && alerts) {
       message(messageObj);
     }
   }
@@ -46,9 +55,12 @@ const binance = (trade) => {
 
 const bitfinex = (trade) => {
   let channel_id = -1;
+
+  // Bitfinex API does not provide symbols after first stream message.
+  // Instead it provides a channel-id associated with a stream for a crypto pair.
   if(trade.chanId) {
     channel_id = trade.chanId;
-    channel_pair[channel_id] = trade.pair;
+    channel_pair[channel_id] = trade.pair;  // Associating channel_id with symbol (pair) for future lookup.
   } else if(typeof trade[0] == "number")
   channel_id = trade[0];
   
@@ -67,7 +79,7 @@ const bitfinex = (trade) => {
         price,
         exchange: "Bitfinex"
       }
-      if(absQuant >= portion_size*volume && alerts) {
+      if(absQuant >= volume_filter*volume && alerts) {
         message(messageObj);
       }
     }
@@ -107,9 +119,9 @@ const gdax = (trade) => {
     if(side == "buy")
     messageObj.quantity *= -1;
     
-    if(quantity*price >= portion_size*volume && alerts) {
+    if(quantity*price >= volume_filter*volume && alerts) {
       message(messageObj);
     }
   }
 }
-module.exports = {binance, bitfinex, gdax, min_cost, portion_size};
+module.exports = {binance, bitfinex, gdax, min_cost, volume_filter};

@@ -1,3 +1,10 @@
+/**
+ * Used to calculate the Standard Deviation to filter out extreme changes in pricepoints of order book
+ * 
+ * @param {string[]} pricePoints - Binance Order Book Price Levels
+ * @returns {float} Value of Standard Deviation
+ */
+
 module.exports = (pricePoints) => {
   let sum = 0;
   let dif = [];

@@ -1,10 +1,18 @@
+/**
+ * Responsible for handling the order book stream.
+ * The order book stream is gone through to look at the total buy and sell volume of first 20-25 orders.
+ * If the ratio of these totals is significantly large, the user is alerted of the formed buy/sell wall.
+ * 
+ * Even though the alerts are of volume, the file is called wall.js to avoid confusion with volume.js 
+ */
+
 const message = require('./message');
-// const volumes = require('./volume').exchange_volumes;
 const request = require('request-promise-native');
 const sd = require('./sd');
+const alerts = require('../config').volume.alerts;
+const volume = require('../db/volume');
 
-const alerts = true;
-let sensitivity = 2.5; // Minimum 1
+let sensitivity = volume.getMinRatio(); // Minimum 1
 
 let first = {};
 
@@ -41,13 +49,14 @@ let book = {
   "gdax": []
 };
 
+let min_worth = volume.getMinWorth();
 
-let min_worth = {
-  "BTC": 1000000,
-  "ETH": 800000,
-  "EOS": 800000,
-  "LTC": 500000
-}
+// let min_worth = {
+//   "BTC": 1000000,
+//   "ETH": 800000,
+//   "EOS": 800000,
+//   "LTC": 500000
+// }
 // let min_worth = {
 //   "BTC": 0,
 //   "ETH": 0,
@@ -155,6 +164,9 @@ const bitfinex = (order) => {
         sell_total.bitfinex[channel_id] += book.bitfinex[channel_id][index][2];
         book.bitfinex[channel_id].splice(index, 1);
       }
+      // console.log(book.bitfinex[channel_id]);
+      // console.log(price, quantity, book.bitfinex[channel_id].length, book.bitfinex[channel_id].length);
+
       // quantity > 0 ? updateBook(channel_id, "buy") : updateBook(channel_id, "sell");
       // updateBook(channel_id);
       let s_total = sell_total.bitfinex[channel_id];
@@ -233,13 +245,18 @@ const binance = (order) => {
   let asks = order.a;
   let outlier = 0;
   
+  // console.log(u >= book.binance[symbol].lastUId);
+
   if(book.binance[symbol] != undefined && u >= book.binance[symbol].lastUId + 1 
       && (first[symbol] || U == book.binance[symbol].lastUId + 1)) {
     first[symbol] = false;
     try {
-      outlier = parseFloat(book.binance[symbol].bids[0][0]) - (3*sd(book.binance[symbol].bids));
+      if(book.binance[symbol].bids.length > 3)
+        outlier = parseFloat(book.binance[symbol].bids[book.binance[symbol].bids.length-1][0]) - (23*sd(book.binance[symbol].bids));
+      else
+        throw new Error("");
     } catch(e) {
-      outlier = 0;
+      outlier = parseFloat(book.binance[symbol].asks[0][0]) - (23*sd(book.binance[symbol].asks));;
     }
     // console.log("bids", symbol, outlier)
     // console.log(book.binance[symbol]);
@@ -247,6 +264,8 @@ const binance = (order) => {
       let index = book.binance[symbol].bids.findIndex(x => x[0] == pricePoint[0]);
       if(index != -1) {
         buy_total.binance[symbol] -= parseFloat(book.binance[symbol].bids[index][1]);
+        // console.log(parseFloat(pricePoint[0]), parseFloat(pricePoint[1]), book.binance[symbol].bids.length, book.binance[symbol].asks.length);
+        // console.log(book.binance[symbol]);
         if(parseFloat(pricePoint[1]) != 0) {
           book.binance[symbol].bids[index][1] = pricePoint[1];
           buy_total.binance[symbol] += parseFloat(pricePoint[1]);
@@ -266,10 +285,13 @@ const binance = (order) => {
     });
     
     try{
-      outlier = parseFloat(book.binance[symbol].asks[book.binance[symbol].asks.length-1][0]) + (3*sd(book.binance[symbol].asks));
+      if(book.binance[symbol].asks.length > 3)
+        outlier = parseFloat(book.binance[symbol].asks[0][0]) + (23*sd(book.binance[symbol].asks));
+      else
+        throw new Error("");
     } catch(e) {
-      console.log(book.binance[symbol]);
-      outlier = parseFloat(book.binance[symbol].bids[book.binance[symbol].bids.length-1][0]) + (20*sd(book.binance[symbol].bids));
+      // console.log(book.binance[symbol]);
+      outlier = parseFloat(book.binance[symbol].bids[book.binance[symbol].bids.length-1][0]) + (24*sd(book.binance[symbol].bids));
     }
     // console.log("asks", symbol, outlier)
     // console.log(book.binance[symbol]);
@@ -302,11 +324,11 @@ const binance = (order) => {
     let b_total = buy_total.binance[symbol];
     let bPrice = 0;
     let aPrice = 0;
-    try {
-      bPrice = parseFloat(book.binance[symbol].bids[book.binance[symbol].bids.length-1][0]);
-    } catch(e) {
-      bPrice = parseFloat(book.binance[symbol].asks[0][0]);
-    }
+    // try {
+    //   bPrice = parseFloat(book.binance[symbol].bids[book.binance[symbol].bids.length-1][0]);
+    // } catch(e) {
+    //   bPrice = parseFloat(book.binance[symbol].asks[0][0]);
+    // }
     try {
       aPrice = parseFloat(book.binance[symbol].asks[0][0]);
     } catch(e) {
@@ -314,7 +336,8 @@ const binance = (order) => {
     }
     // console.log(symbol, s_total, b_total, aPrice, bPrice);
     // console.log(book.binance[symbol]);
-    if((s_total*aPrice > min_worth[currency]) || (b_total*bPrice > min_worth[currency])) {
+    let book_length_check = Math.abs(book.binance[symbol].bids.length - book.binance[symbol].asks.length) < 3;
+    if(book_length_check && ((s_total*aPrice > min_worth[currency]) || (b_total*aPrice > min_worth[currency]))) {
       let sb_ratio = s_total/b_total;
       // console.log(symbol, sb_ratio, s_total/b_total);
       let messageObj = {
@@ -367,9 +390,7 @@ const binance = (order) => {
         message(messageObj);
       }
     }
-    
   }
-  
 }
 
 module.exports = {bitfinex, binance, min_worth, sensitivity};

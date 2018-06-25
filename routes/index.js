@@ -1,17 +1,19 @@
 var express = require('express');
 var router = express.Router();
-let trade = require('../bin/trade');
-let wall = require('../bin/wall');
-let message = require('../bin/message');
+let wall = require('../app_modules/wall');
+let message = require('../app_modules/message');
+
+let trade = require('../db/trade');
+let volume = require('../db/volume');
 
 /* GET home page. */
 router.get('/', function(req, res) {
   let client_obj = { 
     title: 'Whale Tracker', 
-    min: trade.min_cost, 
-    portion: trade.portion_size,
-    vol: wall.min_worth,
-    vol_ratio: wall.sensitivity
+    min: trade.getMinWorth(), 
+    portion: trade.getVolFilter(),
+    vol: volume.getMinWorth(),
+    vol_ratio: volume.getMinRatio()
   }
   res.render('index', client_obj);
 });
@@ -23,25 +25,25 @@ router.post('/', function(req, res) {
   message(messageObj);
 
   if(req.body.btc > 35000)
-    trade.min_cost["BTC"] = req.body.btc;
+    trade.setMinWorth('BTC', req.body.btc);
   if(req.body.ltc > 35000)
-    trade.min_cost["LTC"] = req.body.ltc;
+    trade.setMinWorth('LTC', req.body.ltc);
   if(req.body.eos > 35000)
-    trade.min_cost["EOS"] = req.body.eos;
+    trade.setMinWorth('EOS', req.body.eos);
   if(req.body.eth > 35000)
-    trade.min_cost["ETH"] = req.body.eth;
+    trade.setMinWorth('ETH', req.body.eth);
   if(req.body.btc_vol >= 500000)
-    wall.min_worth["BTC"] = req.body.btc_vol;
+    volume.setMinWorth('BTC', req.body.btc_vol);
   if(req.body.ltc_vol >= 400000)
-    wall.min_worth["LTC"] = req.body.ltc_vol;
+    volume.setMinWorth('LTC', req.body.ltc_vol);
   if(req.body.eos_vol >= 400000)
-    wall.min_worth["EOS"] = req.body.eos_vol;
+    volume.setMinWorth('EOS', req.body.eos_vol);
   if(req.body.eth_vol >= 500000)
-    wall.min_worth["ETH"] = req.body.eth_vol;
+    volume.setMinWorth('ETH', req.body.eth_vol);
   if(req.body.ratio >= 1.5)
-    wall.sensitivity = req.body.ratio;
+    volume.setMinRatio(req.body.ratio);
 
-  trade.portion_size = req.body.portion / 100;
+  trade.setVolFilter(req.body.portion);
 
   res.redirect("/");
 });

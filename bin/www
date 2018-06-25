@@ -4,15 +4,17 @@
  * Module dependencies.
  */
 
+require('dotenv').config();
 var app = require('../app');
 var debug = require('debug')('whale-tracker:server');
 var http = require('http');
 
 const WebSocket = require('ws');
-const trade = require('./trade');
-const wall = require('./wall');
+const trade = require('../app_modules/trade');
+const wall = require('../app_modules/wall');
 
 
+// ========================================== WebSockets ========================================
 let sockets = {
   binance: new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@aggTrade/eosusdt@aggTrade/ethusdt@aggTrade/btcusdt@depth/eosusdt@depth/ethusdt@depth'),
   bitfinex: new WebSocket('wss://api.bitfinex.com/ws/2'),
@@ -27,6 +29,8 @@ const refreshStream = () => {
   sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@aggTrade/eosusdt@aggTrade/ethusdt@aggTrade/btcusdt@depth/eosusdt@depth/ethusdt@depth');
 }
 
+// Binance API documentation says the streams expire after 24 hours.
+// Re-subscribing to the stream after 20 hours
 setInterval(refreshStream, 72000000);
 
 sockets.binance.on('message', function incoming(data) {
@@ -55,8 +59,8 @@ sockets.bitfinex.on('open', () => {
     event: "subscribe", 
     channel: "book", 
     symbol: "",
-    prec: "P0",
-    freq: "F1",
+    prec: "P0", // Aggregation of price levels
+    freq: "F1", // Frequency of stream: F1 - Every 2 seconds
     length: "25"  
   }
 
@@ -102,6 +106,7 @@ sockets.gdax.on('message', (data) => {
     // wall.gdax(obj);
 })
 
+// ========================================== WebSockets ========================================
 
 
 /**

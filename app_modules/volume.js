@@ -1,3 +1,8 @@
+/**
+ * This file is responsible for providing the 24hr volume of a cryptocurrency pair.
+ * The volume can be used to identify how big a trade is when compared to the total volume of a pair on an exchange. 
+ */
+
 const request = require('request-promise-native');
 
 let exchange_volumes = {

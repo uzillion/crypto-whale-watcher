@@ -1,14 +1,18 @@
 {
-  "name": "whale-tracker",
-  "version": "0.0.0",
+  "name": "crypto-whale-watcher",
+  "version": "1.0.0",
   "private": true,
+  "author": "Uzair Inamdar <uzair_inamdar@hotmail.com>",
   "scripts": {
     "start": "node ./bin/www",
-    "start:dev": "nodemon ./bin/www"
+    "start:dev": "nodemon ./bin/www",
+    "prepare": "node ./db/migration.js"
   },
   "dependencies": {
+    "better-sqlite3": "^4.1.4",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
+    "dotenv": "^6.0.0",
     "ejs": "~2.5.7",
     "express": "~4.16.0",
     "http-errors": "~1.6.2",
@@ -17,5 +21,6 @@
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
     "ws": "^5.2.0"
-  }
+  },
+  "license": "GPL-3.0-only"
 }

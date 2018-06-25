@@ -1,11 +1,12 @@
 const request = require('request-promise-native');
+const config = require('../config');
 let prev_msg_id = 0;
 let prev_to_id = "";
 let prev_mo_id = "";
 let prev_quantity = 0;
-let test = false;
+// let test = false;
 
-let CHAT_ID = "-1001236925237";
+let CHAT_ID = config.CHAT_ID;
 
 const sendMessage = (chatOptions) => {
   return request(chatOptions)
@@ -66,11 +67,11 @@ const build = (messageObj) => {
     encoded_message = encodeURIComponent(`*VOLUME:*\n${symbol} (${exchange})\n${side} volume is down compared to before`);
   }
   
-  if(test)
-    CHAT_ID = "-1001231773685";
+  if(config.TESTING)
+    CHAT_ID = config.TEST_CHAT_ID;
 
   var chatOptions = {
-    uri: `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/sendMessage?parse_mode=Markdown&chat_id=${CHAT_ID}&text=${encoded_message}`,
+    uri: `https://api.telegram.org/bot${config.BOT_TOKEN}/sendMessage?parse_mode=Markdown&chat_id=${CHAT_ID}&text=${encoded_message}`,
     headers: {
       'User-Agent': 'Request-Promise'
     },
@@ -79,7 +80,7 @@ const build = (messageObj) => {
   
   if(to_id == prev_to_id || mo_id == prev_mo_id) {
     if(quantity > prev_quantity) {
-      chatOptions.uri = `https://api.telegram.org/bot596257066:AAGkmCVBSgYx0FvPV-OElc7ZwTypnLj4ipw/editMessageText?parse_mode=Markdown&chat_id=${CHAT_ID}&message_id=${prev_msg_id}&text=${encoded_message}`;
+      chatOptions.uri = `https://api.telegram.org/bot${config.BOT_TOKEN}/editMessageText?parse_mode=Markdown&chat_id=${CHAT_ID}&message_id=${prev_msg_id}&text=${encoded_message}`;
       sendMessage(chatOptions)
       .then((res) => {
         // console.log("This is res:", res);

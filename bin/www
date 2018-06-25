@@ -4,13 +4,14 @@
  * Module dependencies.
  */
 
+require('dotenv').config();
 var app = require('../app');
 var debug = require('debug')('whale-tracker:server');
 var http = require('http');
 
 const WebSocket = require('ws');
-const trade = require('./trade');
-const wall = require('./wall');
+const trade = require('../app_modules/trade');
+const wall = require('../app_modules/wall');
 
 
 let sockets = {

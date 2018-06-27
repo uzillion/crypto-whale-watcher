@@ -40,7 +40,7 @@ Constantly looking at the order book and depth charts of different crypto-curren
 The app is made to use certain limits and services that may or may not be suitable for others. Therefore it is possible to make changes and customize the app to better suit the developers requirements. Please do not send pull requests to the main repository with these changes.
 
 ### Limits
-The alerts are triggered by checking the various limits for the crypto-currency. You can learn about each limit in the [wiki]() section of this project.
+The alerts are triggered by checking the various limits for the crypto-currency. You can learn about each limit in the [wiki](https://github.com/uzillion/crypto-whale-watcher/wiki) section of this project.
 
 Limit changes are persistent and are saved to the filesystem in form of an SQLite3 databse. Limits can easily be changed without affecting the repository by running the app on your local machine, and then going to the webpage on [localhost:3000](http://localhost:3000); or if being hosted elsewhere, going to the endpoint provided by the hosting service.
 
@@ -50,7 +50,7 @@ Limits can also be changed by deleting whale-watch.db file from the db folder, e
 ### Alerts
 The app currently uses Telegram as the medium for alerts. However, if one requires they can choose to replace it with other services like Discord. It is recommended you keep the structure of the functions the same.
 
-The alerts are managed in [message.js](./app_modules/message.js).
+The alerts are managed in [message.js](./core/message.js).
 
 ## Contributing
 I really appreciate all the help that I can get, but following a few guidelines can go a long way in a hassle-free transition of your contributions into the project.

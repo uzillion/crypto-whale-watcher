@@ -15,6 +15,7 @@
     "dotenv": "^6.0.0",
     "ejs": "~2.5.7",
     "express": "~4.16.0",
+    "fs": "0.0.1-security",
     "http-errors": "~1.6.2",
     "morgan": "~1.9.0",
     "nodemon": "^1.17.5",

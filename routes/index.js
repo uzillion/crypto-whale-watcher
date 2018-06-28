@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
-let wall = require('../app_modules/wall');
-let message = require('../app_modules/message');
+const updateLimits = require('../core/updateLimits');
+let message = require('../core/message');
+let a = require('../core/trade/binance');
+
 
 let trade = require('../db/trade');
 let volume = require('../db/volume');
@@ -44,7 +46,8 @@ router.post('/', function(req, res) {
     volume.setMinRatio(req.body.ratio);
 
   trade.setVolFilter(req.body.portion);
-
+  updateLimits();
+  
   res.redirect("/");
 });
 

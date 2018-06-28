@@ -10,8 +10,8 @@ var debug = require('debug')('whale-tracker:server');
 var http = require('http');
 
 const WebSocket = require('ws');
-const trade = require('../app_modules/trade');
-const wall = require('../app_modules/wall');
+const trade = require('../core/trade');
+const wall = require('../core/wall');
 
 
 // ========================================== WebSockets ========================================

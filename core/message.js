@@ -11,13 +11,9 @@ let CHAT_ID = config.CHAT_ID;
 const sendMessage = (chatOptions) => {
   return request(chatOptions)
   .catch(function (err) {
-    console.log("Send Message:", err.message);
+    console.log("Main:", err.message);
   });
 }
-
-/**
- * @param {Object} messageObj - Message Object to build message
- */
 
 const build = (messageObj) => {
   let event = messageObj.event;
@@ -82,7 +78,6 @@ const build = (messageObj) => {
     json: true
   };
   
-  // GDAX: Updating message if trade is part of the same previous order
   if(to_id == prev_to_id || mo_id == prev_mo_id) {
     if(quantity > prev_quantity) {
       chatOptions.uri = `https://api.telegram.org/bot${config.BOT_TOKEN}/editMessageText?parse_mode=Markdown&chat_id=${CHAT_ID}&message_id=${prev_msg_id}&text=${encoded_message}`;

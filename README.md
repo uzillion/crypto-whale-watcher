@@ -1,7 +1,7 @@
 # Crypto Whale Watcher
 Constantly looking at the order book and depth charts of different crypto-currencies on different exchanges can be painstakingly tedious. Hence, I decided to create this app to keep a watch over the different exchanges and currencies at the same time without being bothered by insignificant trades and orders. With this app, a person can get real time trade and volume alerts, currently on Telegram, but easily switchable with other services.
 
-## Disclosure
+## A Note About Exchange APIs
 You might notice I haven't used any of the exchanges' respective node modules in this project, and have instead gone with the raw REST APIs. This is because I did not realize these modules existed until much later into the development process. Therefore, I understand that my API calls might come with manual need for stream management. But I feel going through the documentations of these modules, then rewriting the code would cause a significant waste of time and resources until I am made to realize otherwise.
 
 ## Table of Contents

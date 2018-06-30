@@ -60,6 +60,7 @@ I really appreciate all the help that I can get, but following a few guidelines 
 
 * Forking the main repository is always the best way to contribute and keep track of changes.
 * Document your code, and try to follow the code style of the the base project.
+* Auth Tokens, Access Codes, etc. should be loaded as environment variables from .env file (.env is already gitignore-d), and should not appear anywhere in the code, nor should they be uploaded to the repository in any form.
 * Always try and add as much description as possible with your pull requests. The following are few questions you could answer while writing the description:
   + What were you trying to do?
   + Were you successful in doing so?

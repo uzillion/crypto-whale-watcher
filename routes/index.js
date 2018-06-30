@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const updateLimits = require('../core/updateLimits');
 let message = require('../core/message');
-let a = require('../core/trade/binance');
+let a = require('../core/trades/binance');
 
 
 let trade = require('../db/trade');

@@ -1,25 +1,25 @@
 const fs = require('fs');
 
 const updateLimits = () => {
-  fs.readdir('./core/trade/', (err, files) => {
+  fs.readdir('./core/trades/', (err, files) => {
     if(err)
       console.log(err);
     else {
       files.forEach((file) => {
         if(file != 'index.js') {
-          require('../core/trade/'+file).updateLimits();
+          require('../core/trades/'+file).updateLimits();
         }
       });
     }
   });
 
-  fs.readdir('./core/wall/', (err, files) => {
+  fs.readdir('./core/orders/', (err, files) => {
     if(err)
       console.log(err);
     else {
       files.forEach((file) => {
         if(file != 'index.js') {
-          require('../core/wall/'+file).updateLimits();
+          require('../core/orders/'+file).updateLimits();
         }
       });
     }

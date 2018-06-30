@@ -51,7 +51,7 @@ Limits can also be changed by deleting whale-watch.db file from the db folder, e
 **This method is not recommended if you plan to contribute to the main repository.**
 
 ### Alerts
-The app currently uses Telegram as the medium for alerts. However, if one requires they can choose to replace it with other services like Discord. It is recommended you keep the structure of the functions the same.
+The app currently uses Telegram as the medium for alerts. However, if one requires they can choose to add and/or replace it with other services like Discord. It is recommended you keep the structure of the functions the same.
 
 The alerts are managed in [message.js](./core/message.js).
 

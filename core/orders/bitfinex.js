@@ -2,20 +2,30 @@ const message = require('../message');
 const alerts = require('../../config').volume.alerts;
 const volume = require('../../db/volume');
 
-let sensitivity = volume.getMinRatio();
+let sensitivity = 100;
+volume.getMinRatio().then((data) => {
+  sensitivity = data.ratio;
+});
 
 const sell_total = {};
 const buy_total = {};
 const wall = {};
 const book = {};
-let min_worth = volume.getMinWorth();
 let channel_pair = {};
 
-const updateLimits = () => {
-  min_worth = volume.getMinWorth();
-  sensitivity = volume.getMinRatio();
-}
+let min_worth = {};
+volume.getMinWorth().then((data) => {
+  min_worth = data;
+});
 
+const updateLimits = () => {
+  volume.getMinWorth().then((data) => {
+    min_worth = data;
+  });
+  volume.getMinRatio().then((data) => {
+    sensitivity = data.ratio;
+  });
+}
 
 const updateBook = (key, option) => {
   // sell_total = 0;

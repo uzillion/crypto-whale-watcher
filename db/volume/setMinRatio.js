@@ -1,9 +1,10 @@
 const db = require('../index');
 
-let statement = db.prepare('UPDATE MinVolumeRatio SET ratio=?');
+let QUERY = 'UPDATE MinVolumeRatio SET ratio=$1';
 
 const setMinRatio = (ratio) => {
-  statement.run(ratio);
+  return db.query(QUERY, ratio)
+    .catch((err) => console.log(err.stack));
 }
 
 module.exports = setMinRatio;

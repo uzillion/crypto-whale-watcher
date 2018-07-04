@@ -20,13 +20,19 @@ You might notice I haven't used any of the exchanges' respective node modules in
 
 3. Add the bot to a group or channel, and [get its chat_id][].
 
-4. Create a file with name ".env" in the parent directory.
+4. Create a PostgreSQL database.<br>
+   **USEFUL LINKS**:<br>
+   [Installation](https://www.postgresql.org/download/)<br>
+   [Creating Database](https://www.tutorialspoint.com/postgresql/postgresql_create_database.htm)
 
-5. Add the auth-token and respective chat_id(s) to the ".env" file as key-value pairs in the following way:
+5. Create a file with name ".env" in the parent directory.
+
+6. Add the auth-token, respective chat_id(s), and database url to the ".env" file as key-value pairs in the following way:
     ```
-    BOT_TOKEN=Your:BotsAuthToken1234
-    CHAT_ID=MainChatId1234
-    TEST_CHAT_ID=ChatIdForTesting1234
+    BOT_TOKEN=Your:<your-bot-token>
+    CHAT_ID=<main-chat-id>
+    TEST_CHAT_ID=<test-chat-id>
+    DATABASE_URL=postgres://<username>@localhost:5432/<db-name>
     ```   
    + On a *nix OS, steps 4 and 5 can be combined by typing the following lines in sequence in the terminal:
       ```bash
@@ -34,10 +40,13 @@ You might notice I haven't used any of the exchanges' respective node modules in
      echo "BOT_TOKEN=<your-bot-token>" >> .env
      echo "CHAT_ID=<main-chat-id>" >> .env
      echo "TEST_CHAT_ID=<test-chat-id>" >> .env
+     echo "DATABASE_URL=$USER@localhost:5432/<db-name>" >> .env
      ```
-6. Run `npm install`, and run the app via `npm start`.
+7. Run `npm install`, and run the app via `npm start`.
 
-**Note**: On your local machine, the app will be served on port 3000 of localhost.
+**Notes**:
+* A lot of the major hosting services come preinstalled with PostgreSQL or provide some plugin. Therefore the steps for creating and setting up the database may differ. For example, [Heroku](https://www.heroku.com/) has an excellend PostgreSQL plugin which upon installation automatically adds the environment variable for the database URL.
+* On your local machine, the app will be served on port 3000 of localhost.
 
 ## Customizing
 The app is made to use certain limits and services that may or may not be suitable for others. Therefore it is possible to make changes and customize the app to better suit the developers requirements. Please do not send pull requests to the main repository with these changes.
@@ -73,12 +82,13 @@ Your pull requests, more likely than not, will always be accepted. But if they a
 Please feel free to post issues and feature requests to the issue tab.
 
 ## Support
+If you like the project and would like to keep seeing future improvements, please consider donating.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.me/UzairIn)
 
-**BTC** : 174EZsHia5YJqp9v4dNFgauLGB9x4uPbAN
+**BTC** : `174EZsHia5YJqp9v4dNFgauLGB9x4uPbAN`
 
-**ETH** : 0x05ce071925189beb5d8dff046ee5f1cbb1c5b7ef
+**ETH** : `0x05ce071925189beb5d8dff046ee5f1cbb1c5b7ef`
 
 ## License
 [GPLv3](LICENSE)

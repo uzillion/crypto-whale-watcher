@@ -1,9 +1,10 @@
 const db = require('../index');
 
-let statement = db.prepare('UPDATE TradeWorth SET worth=? WHERE symbol=?');
+let QUERY = 'UPDATE TradeWorth SET worth=$1 WHERE symbol=$2';
 
 const setMinWorth = (symbol, worth) => {
-  statement.run([worth, symbol]);
+  return db.query(QUERY, [worth, symbol])
+    .catch((err) => console.log(err.stack));
 }
 
 module.exports = setMinWorth;

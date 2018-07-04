@@ -3,16 +3,28 @@ const volumes = require('../volume').exchange_volumes;
 const alerts = require('../../config').trade.alerts;
 const trade = require('../../db/trade');
 
-let min_worth = trade.getMinWorth();
-let volume_filter = trade.getVolFilter() / 100; // Recommended value = 0.001
-
 let prev_maker_order_id = "";
 let prev_taker_order_id = "";
 let prev_quantity = 0;
 
+let min_worth = {};
+trade.getMinWorth().then((data) => {
+  min_worth = data;
+});
+
+let volume_filter = 0; // Recommended value = 0.001
+trade.getVolFilter().then((data) => {
+  volume_filter = data.percent/100;
+});
+
+
 const updateLimits = () => {
-  min_worth = trade.getMinWorth();
-  volume_filter = trade.getVolFilter() / 100;
+  trade.getMinWorth().then((data) => {
+    min_worth = data;
+  });
+  trade.getVolFilter().then((data) => {
+    volume_filter = data.percent/100;
+  });
 }
 
 const gdax = (trade) => {

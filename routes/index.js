@@ -2,22 +2,63 @@ var express = require('express');
 var router = express.Router();
 const updateLimits = require('../core/updateLimits');
 let message = require('../core/message');
-let a = require('../core/trades/binance');
-
 
 let trade = require('../db/trade');
 let volume = require('../db/volume');
+
+const changeLimits = async (body) => {
+  if(body.btc > 35000)
+    await trade.setMinWorth('BTC', body.btc);
+  if(body.ltc > 35000)
+    await trade.setMinWorth('LTC', body.ltc);
+  if(body.eos > 35000)
+    await trade.setMinWorth('EOS', body.eos);
+  if(body.eth > 35000)
+    await trade.setMinWorth('ETH', body.eth);
+  if(body.btc_vol >= 500000)
+    await volume.setMinWorth('BTC', body.btc_vol);
+  if(body.ltc_vol >= 400000)
+    await volume.setMinWorth('LTC', body.ltc_vol);
+  if(body.eos_vol >= 400000)
+    await volume.setMinWorth('EOS', body.eos_vol);
+  if(body.eth_vol >= 500000)
+   await volume.setMinWorth('ETH', body.eth_vol);
+  if(body.ratio >= 1.5)
+    await volume.setMinRatio(body.ratio);
+
+  await trade.setVolFilter(body.portion);
+  updateLimits();
+} 
 
 /* GET home page. */
 router.get('/', function(req, res) {
   let client_obj = { 
     title: 'Whale Tracker', 
-    min: trade.getMinWorth(), 
-    portion: trade.getVolFilter(),
-    vol: volume.getMinWorth(),
-    vol_ratio: volume.getMinRatio()
+    min: {}, 
+    portion: null,
+    vol: {},
+    vol_ratio: null
   }
-  res.render('index', client_obj);
+
+  let p1 = trade.getMinWorth().then((data) => {
+    client_obj.min = data;
+  });
+  
+  let p2 = trade.getVolFilter().then((data) => {
+    client_obj.portion = data.percent;
+  });
+  
+  let p3 = volume.getMinWorth().then((data) => {
+    client_obj.vol = data;
+  });
+  
+  let p4 = volume.getMinRatio().then((data) => {
+    client_obj.vol_ratio = data.ratio;
+  });
+
+  Promise.all([p1, p2, p3, p4]).then(() => {
+    res.render('index', client_obj);
+  });
 });
 
 router.post('/', function(req, res) {
@@ -25,30 +66,10 @@ router.post('/', function(req, res) {
     event: 'limit-change',
   }
   message(messageObj);
-
-  if(req.body.btc > 35000)
-    trade.setMinWorth('BTC', req.body.btc);
-  if(req.body.ltc > 35000)
-    trade.setMinWorth('LTC', req.body.ltc);
-  if(req.body.eos > 35000)
-    trade.setMinWorth('EOS', req.body.eos);
-  if(req.body.eth > 35000)
-    trade.setMinWorth('ETH', req.body.eth);
-  if(req.body.btc_vol >= 500000)
-    volume.setMinWorth('BTC', req.body.btc_vol);
-  if(req.body.ltc_vol >= 400000)
-    volume.setMinWorth('LTC', req.body.ltc_vol);
-  if(req.body.eos_vol >= 400000)
-    volume.setMinWorth('EOS', req.body.eos_vol);
-  if(req.body.eth_vol >= 500000)
-    volume.setMinWorth('ETH', req.body.eth_vol);
-  if(req.body.ratio >= 1.5)
-    volume.setMinRatio(req.body.ratio);
-
-  trade.setVolFilter(req.body.portion);
-  updateLimits();
   
-  res.redirect("/");
+  changeLimits(req.body).then(() => {
+    res.redirect("/");
+  });
 });
 
 module.exports = router;

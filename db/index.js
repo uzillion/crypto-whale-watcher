@@ -1,4 +1,5 @@
-const sqlite3 = require("better-sqlite3");
-const db = sqlite3('./db/whale-watch.db', {fileMustExist: true});
+require('dotenv').config();
+const pg = require("pg-promise")();
+const db = pg(process.env.DATABASE_URL);
 
 module.exports = db;

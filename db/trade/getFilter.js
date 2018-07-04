@@ -1,9 +1,10 @@
 const db = require('../index');
 
-let statement = db.prepare('SELECT * FROM VolumeFilter');
+let QUERY = 'SELECT percent FROM VolumeFilter';
 
 const getVolFilter = () => {
-  return statement.get().percent;
+  return db.one(QUERY)
+    .catch((err) => console.log(err.stack));
 }
 
 module.exports = getVolFilter;

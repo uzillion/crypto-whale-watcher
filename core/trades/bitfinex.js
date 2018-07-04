@@ -3,17 +3,30 @@ const volumes = require('../volume').exchange_volumes;
 const alerts = require('../../config').trade.alerts;
 const trade = require('../../db/trade');
 
-let min_worth = trade.getMinWorth();
-let volume_filter = trade.getVolFilter() / 100; // Recommended value = 0.001
+let min_worth = {};
+trade.getMinWorth().then((data) => {
+  min_worth = data;
+});
+
+let volume_filter = 0; // Recommended value = 0.001
+trade.getVolFilter().then((data) => {
+  volume_filter = data.percent/100;
+});
 
 let channel_pair = {};
 
 const updateLimits = () => {
-  min_worth = trade.getMinWorth();
-  volume_filter = trade.getVolFilter() / 100;
+  trade.getMinWorth().then((data) => {
+    min_worth = data;
+  });
+  trade.getVolFilter().then((data) => {
+    volume_filter = data.percent/100;
+  });
 }
 
 const bitfinex = (trade) => {
+
+  // console.log(min_worth.BTC);
   let channel_id = -1;
 
   // Bitfinex API does not provide symbols after first stream message.

@@ -1,4 +1,6 @@
 # Crypto Whale Watcher
+[![Build Status](https://travis-ci.org/uzillion/crypto-whale-watcher.svg?branch=master)](https://travis-ci.org/uzillion/crypto-whale-watcher)
+
 Constantly looking at the order book and depth charts of different crypto-currencies on different exchanges can be painstakingly tedious. Hence, I decided to create this app to keep a watch over the different exchanges and currencies at the same time without being bothered by insignificant trades and orders. With this app, a person can get real time trade and volume alerts, currently on Telegram, but easily switchable with other services.
 
 ## A Note About Exchange APIs

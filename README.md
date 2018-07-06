@@ -12,6 +12,7 @@ You might notice I haven't used any of the exchanges' respective node modules in
   + [Limits](#limits)
   + [Alerts](#alerts)
 * [Contributing](#contributing)
+* [Contact](#contact)
 * [Support](#support)
 * [License](#license)
 
@@ -29,7 +30,7 @@ You might notice I haven't used any of the exchanges' respective node modules in
 
 5. Create a file with name ".env" in the parent directory.
 
-6. Add the auth-token, respective chat_id(s), and database url to the ".env" file as key-value pairs in the following way:
+6. Add the auth-token, respective chat_id(s), and database url to the ".env" file as key-value pairs in the form shown below. These key-value pairs will be exported to the environment variables.
     ```
     BOT_TOKEN=Your:<your-bot-token>
     CHAT_ID=<main-chat-id>
@@ -56,10 +57,9 @@ The app is made to use certain limits and services that may or may not be suitab
 ### Limits
 The alerts are triggered by checking the various limits for the crypto-currency. You can learn about each limit in the [wiki](https://github.com/uzillion/crypto-whale-watcher/wiki) section of this project.
 
-Limit changes are persistent and are saved to the filesystem in form of an SQLite3 databse. Limits can easily be changed without affecting the repository by running the app on your local machine, and then going to the webpage on [localhost:3000](http://localhost:3000); or if being hosted elsewhere, going to the endpoint provided by the hosting service.
+Limit changes are persistent and are saved to the PostgreSQL databse on the running machine. Limits can easily be changed without affecting the repository through the browser by going to the endpoint of the running app. If you are running the app on your local machine, it'll be served on [localhost:3000](http://localhost:3000).
 
-Limits can also be changed by deleting whale-watch.db file from the db folder, editing the migration file, and running `npm run prepare`, in which case changes will be saved on the repository level. <br>
-**This method is not recommended if you plan to contribute to the main repository.**
+Limits can also be changed by editing the migration file, and running `npm run db:migrate`, in which case changes will be saved on the repository level. **This method is not recommended if you plan to contribute to the main repository.**
 
 ### Alerts
 The app currently uses Telegram as the medium for alerts. However, if one requires they can choose to add and/or replace it with other services like Discord. It is recommended you keep the structure of the functions the same.
@@ -71,17 +71,20 @@ I really appreciate all the help that I can get, but following a few guidelines 
 
 * Forking the main repository is always the best way to contribute and keep track of changes.
 * Document your code, and try to follow the code style of the the base project.
-* Auth Tokens, Access Codes, etc. should be loaded as environment variables from .env file (.env is already gitignore-d), and should not appear anywhere in the code, nor should they be uploaded to the repository in any form.
+* Auth Tokens, Access Codes, etc. should be loaded from environment variables, and should not appear anywhere in the code, nor should they be uploaded to the repository in any form.
 * Always try and add as much description as possible with your pull requests. The following are few questions you could answer while writing the description:
   + What were you trying to do?
   + Were you successful in doing so?
   + If yes, briefly describe what you did.
   + Else, what do you think is the problem, and what all did you try to solve the problem?
-* Always double check that your changes do not break the main project. 
+* Your pull request should at least pass the placed build tests. Always double check that your changes do not break the main project. 
 
-Your pull requests, more likely than not, will always be accepted. But if they are not, I will make sure to add a reason.
+In case your pull-requests are not accepted, I will make sure to add a reason.
 
-Please feel free to post issues and feature requests to the issue tab.
+Please feel free to post issues and feature requests to the issue tab. If you have any other questions, you can contact me via email or Telegram.
+
+## Contact
+**Telegram** : @uzair_inamdar
 
 ## Support
 If you like the project and would like to keep seeing future improvements, please consider donating.

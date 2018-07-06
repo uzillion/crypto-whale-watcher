@@ -16,7 +16,9 @@ const getMinWorth = () => {
   return db.many(QUERY)
     .then((rows) => {
       return convert(rows);
-    }).catch((err) => console.log(err.stack));
+    }).catch((err) => {
+      throw err;
+    });
 }
 
 module.exports = getMinWorth;

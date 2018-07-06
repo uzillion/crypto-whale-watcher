@@ -4,7 +4,10 @@ let QUERY = 'SELECT percent FROM VolumeFilter';
 
 const getVolFilter = () => {
   return db.one(QUERY)
-    .catch((err) => console.log(err.stack));
+    .then((data) => {return data.percent})
+    .catch((err) => {
+      throw err;
+    });
 }
 
 module.exports = getVolFilter;

@@ -28,7 +28,7 @@ const createTables = async () => {
 
     await Promise.all([p1, p2, p3, p4]);
   } catch(e) {
-    console.log(e.stack);
+    throw e;
   }
 }
 
@@ -65,6 +65,8 @@ db.query('DROP SCHEMA public CASCADE')
       .then(() => {
         createTables().then(() => {
           insertData();
-        }).catch((err) => console.log(err.stack));
+        }).catch((err) => {
+          throw err;
+        });
       })
   })

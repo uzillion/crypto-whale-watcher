@@ -45,7 +45,7 @@ router.get('/', function(req, res) {
   });
   
   let p2 = trade.getVolFilter().then((data) => {
-    client_obj.portion = data.percent;
+    client_obj.portion = data;
   });
   
   let p3 = volume.getMinWorth().then((data) => {
@@ -53,7 +53,7 @@ router.get('/', function(req, res) {
   });
   
   let p4 = volume.getMinRatio().then((data) => {
-    client_obj.vol_ratio = data.ratio;
+    client_obj.vol_ratio = data;
   });
 
   Promise.all([p1, p2, p3, p4]).then(() => {

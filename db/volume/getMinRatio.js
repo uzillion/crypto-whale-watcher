@@ -4,10 +4,10 @@ let QUERY = 'SELECT ratio FROM MinVolumeRatio';
 
 const getMinRatio = () => {
   return db.one(QUERY)
-    .catch((err) => console.log(err.stack));
-    // .then((data) => {
-      // statement.get().ratio;
-    // });
+    .then((data) => { return data.ratio})
+    .catch((err) => {
+      throw err;
+    });
 }
 
 module.exports = getMinRatio;

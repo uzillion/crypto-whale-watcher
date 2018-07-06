@@ -15,11 +15,11 @@ server.on('listening', () => {
     web_test
   ]).then(() => {
     server.close();
-    console.log("All tests completed")
+    console.log("All tests completed successfully")
     process.exit(0);
   }).catch((err) => {
     server.close();
-    console.error(err.stack);
+    console.error(err);
     process.exit(1);
   });
 });

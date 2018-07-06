@@ -12,7 +12,7 @@ You might notice I haven't used any of the exchanges' respective node modules in
   + [Limits](#limits)
   + [Alerts](#alerts)
 * [Contributing](#contributing)
-* [Contact] (#contact)
+* [Contact](#contact)
 * [Support](#support)
 * [License](#license)
 

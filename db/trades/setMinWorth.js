@@ -1,6 +1,6 @@
 const db = require('../index');
 
-let QUERY = 'UPDATE TradeWorth SET worth=$1 WHERE symbol=$2';
+let QUERY = 'UPDATE MinTradeWorth SET worth=$1 WHERE symbol=$2';
 
 /**
  * 

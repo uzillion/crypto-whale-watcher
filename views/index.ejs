@@ -68,7 +68,7 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><stong>Volume Filter</stong></span>
             </div>
-            <input class="form-control" type="number" style="max-width: 100px" step="0.1" name="portion" value="<%=portion%>">
+            <input class="form-control" type="number" style="max-width: 70px" step="0.1" name="trade_portion" value="<%=trade_portion%>">
             <div class="input-group-append">
               <span class="input-group-text">%</span>
             </div>
@@ -80,7 +80,7 @@
       
       <div class="row">
         <div class="col-12">
-          <h3 style="text-align: center; margin-top: 30px;"><strong>Volume Min-Worth Limits</strong></h3>
+          <h3 style="text-align: center; margin-top: 30px;"><strong>Order Min-Worth Limits</strong></h3>
         </div>
       </div>
       <div class="row" style="margin-top: 40px">
@@ -131,16 +131,27 @@
           </div>
         </div>
         <div class="row" style="margin-top: 40px">
-          <div class="col-12 mx-auto" style="padding-left: 39%">
+          <div class="col-6 mx-auto" style="padding-left: 33%">
             <div class="input-group">
               <div class="input-group-prepend">
                 <span class="input-group-text"><stong>Min Ratio</stong></span>
               </div>
-              <input class="form-control" type="number" style="max-width: 100px" step="0.1" name="ratio" value="<%=vol_ratio%>">
+              <input class="form-control" type="number" style="max-width: 80px" step="0.1" name="ratio" value="<%=vol_ratio%>">
+            </div>
+          </div>
+          <div class="col-6 mx-auto">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><stong>Volume Filter</stong></span>
+              </div>
+              <input class="form-control" type="number" style="max-width: 70px" step="0.1" name="order_portion" value="<%=order_portion%>">
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
             </div>
           </div>
         </div>
-      <input class="btn btn-primary" style="margin: 4% auto auto 48%" type="submit" value="submit">
+      <input class="btn btn-primary" style="margin: 4% auto auto 46.5%" type="submit" value="submit">
     </form>
     
   </div>

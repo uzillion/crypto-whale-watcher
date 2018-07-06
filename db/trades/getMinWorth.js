@@ -1,6 +1,6 @@
 const db = require('../index');
 
-let QUERY = 'SELECT * FROM VolumeWorth';
+let QUERY = 'SELECT * FROM MinTradeWorth';
 
 const convert = (data) => {
   let obj = {};

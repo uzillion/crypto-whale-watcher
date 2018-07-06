@@ -87,7 +87,12 @@ Please feel free to post issues and feature requests to the issue tab. If you ha
 **Telegram** : @uzair_inamdar
 
 ## Support
-If you like the project and would like to keep seeing future improvements, please consider donating.
+My future goals include:
+* Host the server and create a channel/group for everyone to join.
+* Make currency selection dynamic.
+* Make native smartphone and desktop version of the app.
+
+If you like the project and would like to keep seeing future improvements, please consider donating to support hosting and other expenses.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.me/UzairIn)
 

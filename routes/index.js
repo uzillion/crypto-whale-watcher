@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-const updateLimits = require('../core/updateLimits');
-let message = require('../core/message');
+const updateLimits = require('../lib/updateLimits');
+let message = require('../lib/message');
 
 let trade = require('../db/trade');
 let volume = require('../db/volume');

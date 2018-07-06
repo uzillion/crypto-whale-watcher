@@ -11,8 +11,9 @@ You might notice I haven't used any of the exchanges' respective node modules in
 * [Customizing](#customizing)
   + [Limits](#limits)
   + [Alerts](#alerts)
+* [Screenshots](#screenshots)
 * [Contributing](#contributing)
-* [Contact] (#contact)
+* [Contact](#contact)
 * [Support](#support)
 * [License](#license)
 
@@ -65,6 +66,10 @@ Limits can also be changed by editing the migration file, and running `npm run d
 The app currently uses Telegram as the medium for alerts. However, if one requires they can choose to add and/or replace it with other services like Discord. It is recommended you keep the structure of the functions the same.
 
 The alerts are managed in [message.js](./lib/message.js).
+
+## Screenshots
+<img src="./screenshots/telegram.png" alt="drawing" width="300px"/>
+<img src="./screenshots/web.png" alt="drawing" width="800px"/>
 
 ## Contributing
 I really appreciate all the help that I can get, but following a few guidelines can go a long way in a hassle-free transition of your contributions into the project.

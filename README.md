@@ -74,7 +74,7 @@ The alerts are managed in [message.js](./lib/message.js).
 ### **Telegram :**
 <img src="./screenshots/telegram.png" alt="drawing" width="300px"/>
 
-### **Website :**
+### **Webpage :**
 <img src="./screenshots/web.png" alt="drawing" width="800px"/>
 
 ## Contributing

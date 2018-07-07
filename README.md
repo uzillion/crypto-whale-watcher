@@ -3,6 +3,8 @@
 
 Constantly looking at the order book and depth charts of different crypto-currencies on different exchanges can be painstakingly tedious. I decided to create this app to simultaneously monitor different exchanges and currencies without being bothered by insignificant trades and orders. With this app, a person can get real time trade and volume alerts, currently on Telegram, but easily switchable with other services.
 
+This README mostly deals with the setup and r
+
 ## A Note About Exchange APIs
 You might notice I haven't used any of the exchanges' respective node modules in this project, and have instead gone with the raw REST APIs. This is because I did not realize these modules existed until much later into the development process. Therefore, I understand that my API calls might come with manual need for stream management. But I feel going through the documentations of these modules, then rewriting the code would cause a significant waste of time and resources until I am made to realize otherwise.
 
@@ -22,7 +24,7 @@ You might notice I haven't used any of the exchanges' respective node modules in
 
 2. [Create a Telegram Bot][] using BotFather, note down the authorization-token.
 
-3. Add the bot to a group or channel, and [get its chat_id][].
+3. Create a group or channel, and add the bot to it. Then [get the group/channel's chat_id][].
 
 4. Create a PostgreSQL database.<br>
    **USEFUL LINKS**:<br>
@@ -46,7 +48,8 @@ You might notice I haven't used any of the exchanges' respective node modules in
      echo "TEST_CHAT_ID=<test-chat-id>" >> .env
      echo "DATABASE_URL=$USER@localhost:5432/<db-name>" >> .env
      ```
-7. Run `npm install`, and run the app via `npm start`.
+    + There is another optional environment variable for directing alerts to a test chat for development and testing purposes. If you want to do so, add the following on a new line to the ".env" file: `TESTING=true`
+7. Run `npm install`, and run the app via `npm run start`.
 
 **Notes**:
 * A lot of the major hosting services come preinstalled with PostgreSQL or provide some plugin. Therefore the steps for creating and setting up the database may differ. For example, [Heroku](https://www.heroku.com/) has an excellend PostgreSQL plugin which upon installation automatically adds the environment variable for the database URL.
@@ -68,7 +71,10 @@ The app currently uses Telegram as the medium for alerts. However, if one requir
 The alerts are managed in [message.js](./lib/message.js).
 
 ## Screenshots
+### **Telegram :**
 <img src="./screenshots/telegram.png" alt="drawing" width="300px"/>
+
+### **Website :**
 <img src="./screenshots/web.png" alt="drawing" width="800px"/>
 
 ## Contributing
@@ -113,4 +119,4 @@ If you like the project and would like to keep seeing future improvements, pleas
 [Clone]: https://help.github.com/articles/cloning-a-repository/
 [Create a Telegram Bot]: https://core.telegram.org/bots#6-botfather
 [Tutorial]: https://tutorials.botsfloor.com/creating-a-bot-using-the-telegram-bot-api-5d3caed3266d
-[get its chat_id]: https://stackoverflow.com/a/32572159
+[get the group/channel's chat_id]: https://stackoverflow.com/a/32572159

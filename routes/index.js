@@ -27,7 +27,7 @@ const changeLimits = async (body) => {
     await orders.setMinRatio(body.ratio);
 
   await trades.setVolFilter(body.trade_portion);
-  await orders.setVolFiler(body.order_portion);
+  // await orders.setVolFiler(body.order_portion);
   updateLimits();
 } 
 

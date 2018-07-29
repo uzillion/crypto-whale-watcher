@@ -1,7 +1,7 @@
 # Crypto Whale Watcher
 [![Build Status](https://travis-ci.org/uzillion/crypto-whale-watcher.svg?branch=master)](https://travis-ci.org/uzillion/crypto-whale-watcher)
 
-Constantly looking at the order book and depth charts of different crypto-currencies on different exchanges can be painstakingly tedious. I decided to create this app to simultaneously monitor different exchanges and currencies without being bothered by insignificant trades and orders. With this app, a person can get real time trade and volume alerts, currently on Telegram, but easily switchable with other services.
+Constantly looking at the order book and depth charts of different crypto-currencies on different exchanges can be painstakingly tedious. I decided to create this app to simultaneously monitor different exchanges and currencies without being bothered by insignificant trades and orders. With this app, a person can get real time trade and volume alerts from GDAX, Binance, and Bitfinex. These alerts currently occur on Telegram, but are easily switchable with other services.
 
 **Note** : This README mostly deals with the setup and execution of the app. If you want to understand the working of the project and code, please refer to the [wiki][] section.
 
@@ -11,6 +11,7 @@ You might notice I haven't used any of the exchanges' respective node modules in
 ## Table of Contents
 * [Basic Setup](#basic-setup)
 * [Customizing](#customizing)
+  + [Currency Pairs](#currency-pairs)
   + [Limits](#limits)
   + [Alerts](#alerts)
 * [Screenshots](#screenshots)
@@ -58,6 +59,9 @@ You might notice I haven't used any of the exchanges' respective node modules in
 ## Customizing
 The app is made to use certain limits and services that may or may not be suitable for others. Therefore it is possible to make changes and customize the app to better suit the developers requirements. Please do not send pull requests to the main repository with these changes.
 
+### Currency Pairs
+Currency pairs are defined in the [config.js][] file, and can easily be added and removed as needed. One needs to be mindful to try and add pairs that are supported by both Binance and Bitfinex. Not doing so can cause unexpected behavior. 
+
 ### Limits
 The alerts are triggered by checking the various limits for the crypto-currency. You can learn about each limit in the [wiki][] section of this project.
 
@@ -78,21 +82,14 @@ The alerts are managed in [message.js](./lib/message.js).
 <img src="./screenshots/web.png" alt="drawing" width="800px"/>
 
 ## Contributing
-I really appreciate all the help that I can get, but following a few guidelines can go a long way in a hassle-free transition of your contributions into the project.
+If you are a developer trying to contribute to this project, please follow these steps:
+1. Fork and Clone the repository.
+2. Run `npm install`.
+3. Export the DATABASE_URL to the environment using `export` or adding it to a ".env" file.
+4. Run `npm start` or `npm run start:dev` to see if it runs without errors.
+5. Tests can be performed by running `npm test`
 
-* Forking the main repository is always the best way to contribute and keep track of changes.
-* Document your code, and try to follow the code style of the the base project.
-* Auth Tokens, Access Codes, etc. should be loaded from environment variables, and should not appear anywhere in the code, nor should they be uploaded to the repository in any form.
-* Always try and add as much description as possible with your pull requests. The following are few questions you could answer while writing the description:
-  + What were you trying to do?
-  + Were you successful in doing so?
-  + If yes, briefly describe what you did.
-  + Else, what do you think is the problem, and what all did you try to solve the problem?
-* Your pull request should at least pass the placed build tests. Always double check that your changes do not break the main project. 
-
-In case your pull-requests are not accepted, I will make sure to add a reason.
-
-Please feel free to post issues and feature requests to the issue tab. If you have any other questions, you can contact me via email or Telegram.
+Please refer [Contribution Guidelines][] for more information.
 
 ## Contact
 **Telegram** : @uzair_inamdar
@@ -121,3 +118,5 @@ If you like the project and would like to keep seeing future improvements, pleas
 [Tutorial]: https://tutorials.botsfloor.com/creating-a-bot-using-the-telegram-bot-api-5d3caed3266d
 [get the group/channel's chat_id]: https://stackoverflow.com/a/32572159
 [wiki]: https://github.com/uzillion/crypto-whale-watcher/wiki
+[config.js]: https://github.com/uzillion/crypto-whale-watcher/blob/master/config.js
+[Contribution Guidelines]: https://github.com/uzillion/pg-accessor/blob/master/CONTRIBUTING.md

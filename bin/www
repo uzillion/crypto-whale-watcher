@@ -11,28 +11,43 @@ var http = require('http');
 const WebSocket = require('ws');
 const trade = require('../lib/trades');
 const wall = require('../lib/orders');
+const {getPairs} = require('../lib/pairs');
 
 
 // ========================================== WebSockets ========================================
 let sockets = {
-  binance: new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@aggTrade/eosusdt@aggTrade/ethusdt@aggTrade/btcusdt@depth/eosusdt@depth/ethusdt@depth'),
   bitfinex: new WebSocket('wss://api.bitfinex.com/ws/2'),
   gdax: new WebSocket('wss://ws-feed.gdax.com')
 }
+
+const buildBinanceSocket = () => {
+  let stream = "";
+  getPairs("binance").forEach((pair, index) => {
+    pair = pair.toLowerCase();
+    if(index != 0)
+      stream += "/";
+  
+    stream += `${pair}@aggTrade/${pair}@depth`;
+  });
+  return stream;
+}
+sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams='+ buildBinanceSocket());
+
+
 
 // sockets.binance.close();
 // sockets.bitfinex.close();
 // soclets.gdax.close();
 
 const refreshStream = () => {
-  sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@aggTrade/eosusdt@aggTrade/ethusdt@aggTrade/btcusdt@depth/eosusdt@depth/ethusdt@depth');
+  sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams='+ buildBinanceSocket());  
 }
 
 // Binance API documentation says the streams expire after 24 hours.
 // Re-subscribing to the stream after 20 hours
 setInterval(refreshStream, 72000000);
 
-sockets.binance.on('message', function incoming(data) {
+sockets.binance.on('message', function(data) {
   let obj = JSON.parse(data).data;
   if(obj.e == "aggTrade")
     trade.binance(obj);
@@ -41,7 +56,7 @@ sockets.binance.on('message', function incoming(data) {
 });
 
 sockets.bitfinex.on('open', () => {
-  const symbols = ["BTCUSD", "EOSUSD", "LTCUSD", "ETHUSD"]
+  const symbols = getPairs();
 
   let request_object = { 
     event: "subscribe", 
@@ -79,15 +94,11 @@ sockets.bitfinex.on('message', (data) => {
   }
 })
 
-
 sockets.gdax.on('open', () => {
+ 
   let request_object = {     
     "type": "subscribe",     
-    "product_ids": [         
-        "BTC-USD",
-        "LTC-USD",
-        "ETH-USD"
-     ],     
+    "product_ids": getPairs("gdax"),     
      "channels": ["matches"] 
   }
 

@@ -1,6 +1,6 @@
 const db = require('../index');
 
-let QUERY = `SELECT percent FROM VolumeFilter WHERE type='order'`;
+let QUERY = `SELECT percent FROM VolumeFilter WHERE type='trade'`;
 
 const getVolFilter = () => {
   return db.one(QUERY)

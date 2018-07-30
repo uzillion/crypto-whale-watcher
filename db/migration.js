@@ -69,7 +69,7 @@ const insertData = async () => {
   
   let p4 = db.query(`INSERT INTO MinVolumeRatio (ratio) VALUES
   ($1)
-  `,[2.5]);
+  `,[3.5]);
 
   await Promise.all([p3, p4]);
 }

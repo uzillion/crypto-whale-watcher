@@ -9,7 +9,7 @@ module.exports = {
     "BTCUSD", "ETHUSD", "EOSUSD", "LTCUSD", // USD Comparative (use USD even for USDT)
     "ETHBTC", "EOSBTC", "LTCBTC",  // BTC Comparative
   ],
-
+  
   trade: {
     alerts: true,
     min_worth: {  // Used while migrating alert limits to the database

@@ -1,6 +1,6 @@
 {
   "name": "crypto-whale-watcher",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "author": "Uzair Inamdar <uzair_inamdar@hotmail.com>",
   "scripts": {

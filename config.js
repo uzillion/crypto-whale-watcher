@@ -24,7 +24,7 @@ module.exports = {
   order: {
     alerts: true,
     min_worth: {  // Used while migrating alert limits to the database
-      default: 7000000, // Default value for when specific value is not specified below
+      default: 700000, // Default value for when specific value is not specified below
       BTC: 1000000,
       LTC: 500000
     }

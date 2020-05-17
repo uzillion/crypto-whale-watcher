@@ -12,13 +12,11 @@ const WebSocket = require('ws');
 const trade = require('../lib/trades');
 const wall = require('../lib/orders');
 const {getPairs} = require('../lib/pairs');
+const exchanges = require('../config.js').exchanges;
 
 
 // ========================================== WebSockets ========================================
-let sockets = {
-  bitfinex: new WebSocket('wss://api.bitfinex.com/ws/2'),
-  gdax: new WebSocket('wss://ws-feed.gdax.com')
-}
+let sockets = {}
 
 const buildBinanceSocket = () => {
   let stream = "";
@@ -31,90 +29,101 @@ const buildBinanceSocket = () => {
   });
   return stream;
 }
-sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams='+ buildBinanceSocket());
 
+if(exchanges.binance) {
+  sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams='+ buildBinanceSocket());
+  
+  const refreshStream = () => {
+    sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams='+ buildBinanceSocket());  
+  }
+  
+  // Binance API documentation says the streams expire after 24 hours.
+  // Re-subscribing to the stream after 20 hours
+  setInterval(refreshStream, 72000000);
+  
+  sockets.binance.on('message', function(data) {
+    let obj = JSON.parse(data).data;
+    if(obj.e == "aggTrade")
+      trade.binance(obj);
+    else if(obj.e == "depthUpdate")
+      wall.binance(obj);
+  });
+}
+
+if(exchanges.bitfinex) {
+  sockets.bitfinex = new WebSocket('wss://api.bitfinex.com/ws/2'),
+
+  sockets.bitfinex.on('open', () => {
+    const symbols = getPairs();
+  
+    let request_object = { 
+      event: "subscribe", 
+      channel: "trades", 
+      symbol: "" 
+    }
+  
+    symbols.forEach(symbol => {
+      request_object.symbol = symbol;
+      sockets.bitfinex.send(JSON.stringify(request_object))
+    });
+  
+    request_object = { 
+      event: "subscribe", 
+      channel: "book", 
+      symbol: "",
+      prec: "P0", // Aggregation of price levels
+      freq: "F1", // Frequency of stream: F1 - Every 2 seconds
+      length: "25"  
+    }
+  
+    symbols.forEach(symbol => {
+      request_object.symbol = symbol;
+      sockets.bitfinex.send(JSON.stringify(request_object))
+    });
+  
+  });
+  
+  sockets.bitfinex.on('message', (data) => {
+    let obj = JSON.parse(data);
+    if(obj.channel == "trades" || obj[2] != undefined)
+      trade.bitfinex(obj);
+    else if(obj.event != "info") {
+      wall.bitfinex(obj);
+    }
+  });
+
+}
+
+if(exchanges.coinbase) {
+  sockets.coinbase = new WebSocket('wss://ws-feed.pro.coinbase.com')
+
+  sockets.coinbase.on('open', () => {
+ 
+    let request_object = {     
+      "type": "subscribe",     
+      "product_ids": getPairs("coinbase"),     
+      "channels": ["matches"] 
+    }
+  
+    sockets.coinbase.send(JSON.stringify(request_object))
+  
+    request_object.channels = ["level2"];
+    sockets.coinbase.send(JSON.stringify(request_object))
+  });
+  
+  sockets.coinbase.on('message', (data) => {
+    let obj = JSON.parse(data);
+    if(obj.type == "last_match" || obj.type == "match")
+      trade.coinbase(obj);
+    // else if(obj.type == "l2update")
+      // wall.coinbase(obj);
+  })
+}
 
 
 // sockets.binance.close();
 // sockets.bitfinex.close();
-// soclets.gdax.close();
-
-const refreshStream = () => {
-  sockets.binance = new WebSocket('wss://stream.binance.com:9443/stream?streams='+ buildBinanceSocket());  
-}
-
-// Binance API documentation says the streams expire after 24 hours.
-// Re-subscribing to the stream after 20 hours
-setInterval(refreshStream, 72000000);
-
-sockets.binance.on('message', function(data) {
-  let obj = JSON.parse(data).data;
-  if(obj.e == "aggTrade")
-    trade.binance(obj);
-  else if(obj.e == "depthUpdate")
-    wall.binance(obj);
-});
-
-sockets.bitfinex.on('open', () => {
-  const symbols = getPairs();
-
-  let request_object = { 
-    event: "subscribe", 
-    channel: "trades", 
-    symbol: "" 
-  }
-
-  symbols.forEach(symbol => {
-    request_object.symbol = symbol;
-    sockets.bitfinex.send(JSON.stringify(request_object))
-  });
-
-  request_object = { 
-    event: "subscribe", 
-    channel: "book", 
-    symbol: "",
-    prec: "P0", // Aggregation of price levels
-    freq: "F1", // Frequency of stream: F1 - Every 2 seconds
-    length: "25"  
-  }
-
-  symbols.forEach(symbol => {
-    request_object.symbol = symbol;
-    sockets.bitfinex.send(JSON.stringify(request_object))
-  });
-
-});
-
-sockets.bitfinex.on('message', (data) => {
-  let obj = JSON.parse(data);
-  if(obj.channel == "trades" || obj[2] != undefined)
-    trade.bitfinex(obj);
-  else if(obj.event != "info") {
-    wall.bitfinex(obj);
-  }
-})
-
-sockets.gdax.on('open', () => {
- 
-  let request_object = {     
-    "type": "subscribe",     
-    "product_ids": getPairs("gdax"),     
-     "channels": ["matches"] 
-  }
-
-  sockets.gdax.send(JSON.stringify(request_object))
-
-  request_object.channels = ["level2"];
-  sockets.gdax.send(JSON.stringify(request_object))
-});
-
-sockets.gdax.on('message', (data) => {
-  let obj = JSON.parse(data);
-  if(obj.type == "last_match" || obj.type == "match")
-    trade.gdax(obj);
-  // else if(obj.type == "l2update")
-    // wall.gdax(obj);
-})
+// soclets.coinbase.close();
 
 // ========================================== WebSockets ========================================
 

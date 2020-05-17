@@ -5,6 +5,18 @@ module.exports = {
   TESTING: (process.env.TESTING === 'true'),  // Ignore, unless you want to send alerts to a seperate channel while testing, set this to true
   TEST_CHAT_ID: (process.env.TEST_CHAT_ID?process.env.TEST_CHAT_ID:""), // Used when "TESTING" is set to true.
   
+  /**
+   * These are only names of existing exchanges.
+   * 
+   * Just adding the name will not add the exchange to the subscriptions.
+   * If you add an exchange here, you also have to implement it. :)
+   */
+  exchanges: {
+    "binance": true, 
+    "bitfinex": true, 
+    "coinbase": true
+  },
+
   currencies: [
     "BTCUSD", "ETHUSD", "EOSUSD", "LTCUSD", // USD Comparative (use USD even for USDT)
     "ETHBTC", "EOSBTC", "LTCBTC",  // BTC Comparative

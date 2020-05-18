@@ -6,7 +6,7 @@ const getVolFilter = () => {
   return db.one(QUERY)
     .then((data) => {return data.percent})
     .catch((err) => {
-      throw err;
+      console.error(err.stack);
     });
 }
 

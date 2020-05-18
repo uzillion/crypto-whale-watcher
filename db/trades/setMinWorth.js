@@ -10,7 +10,7 @@ let QUERY = 'UPDATE MinTradeWorth SET worth=$1 WHERE symbol=$2';
 const setMinWorth = (symbol, worth) => {
   return db.query(QUERY, [worth, symbol])
     .catch((err) => {
-      throw err;
+      console.error(err.stack);
     });
 }
 

@@ -17,7 +17,7 @@ const getMinWorth = () => {
     .then((rows) => {
       return convert(rows);
     }).catch((err) => {
-      throw err;
+      console.error(err.stack);
     });
 }
 

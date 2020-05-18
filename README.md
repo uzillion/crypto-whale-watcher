@@ -41,7 +41,7 @@ You might notice I haven't used any of the exchanges' respective node modules in
     TEST_CHAT_ID=<test-chat-id>
     DATABASE_URL=postgres://<username>@localhost:5432/<db-name>
     ```   
-   + On a *nix OS, steps 4 and 5 can be combined by typing the following lines in sequence in the terminal:
+   + On a *nix OS, steps 5 and 6 can be combined by typing the following lines in sequence in the terminal:
       ```bash
      touch .env
      echo "BOT_TOKEN=<your-bot-token>" >> .env
@@ -53,7 +53,7 @@ You might notice I haven't used any of the exchanges' respective node modules in
 7. Run `npm install`, and run the app via `npm run start`. 
 
 **Notes**:
-* If you get Database errors, try running `npm run db:migrate`. **IMPORTANT**: This command deletes and recreates all tables. Run this only the first time.
+* If you get Database errors, try running `npm run db:migrate`. **IMPORTANT**: This command deletes and recreates all tables. You will need to run this every time you make a change in the list of currencies in the config file.
 * A lot of the major hosting services come preinstalled with PostgreSQL or provide some plugin. Therefore the steps for creating and setting up the database may differ. For example, [Heroku](https://www.heroku.com/) has an excellend PostgreSQL plugin which upon installation automatically adds the environment variable for the database URL.
 * On your local machine, the app will be served on port 3000 of localhost.
 

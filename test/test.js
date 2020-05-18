@@ -19,7 +19,7 @@ server.on('listening', () => {
     process.exit(0);
   }).catch((err) => {
     server.close();
-    console.error(err);
+    console.error(err.stack);
     process.exit(1);
   });
 });

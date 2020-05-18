@@ -3,6 +3,9 @@
 * Migrates default data into the newly created tables. 
 */
 
+/*
+  TODO: Make functions promise rejection safe.
+*/ 
 const db = require('./index');
 const config = require('../config');
 const {getCurrencies, interval_id} = require('../lib/pairs');
@@ -31,47 +34,35 @@ const createTables = async () => {
 
     await Promise.all([p1, p2, p3, p4]);
   } catch(e) {
-    throw e;
+    return Promise.reject(e)
   }
 }
 
 const insertData = async () => {
+  try {
+    for(currency of getCurrencies(true)) {
+      await db.query(`INSERT INTO MinTradeWorth (symbol, worth) VALUES
+        ($1, $2)`,
+        [currency, config.trade.min_worth[currency]?config.trade.min_worth[currency]:config.trade.min_worth.default]);
+    }  
 
-  // let p1 = db.query(`INSERT INTO MinTradeWorth (symbol, worth) VALUES
-  // ($1, $2),
-  // ($3, $4),
-  // ($5, $6),
-  // ($7, $8)
-  // `,['BTC', 70000, 'ETH', 50000, 'LTC', 40000, 'EOS', 40000]);
-  
-  getCurrencies(true).forEach(async (currency) => {
-    await db.query(`INSERT INTO MinTradeWorth (symbol, worth) VALUES
-      ($1, $2)`,[currency, config.trade.min_worth[currency]?config.trade.min_worth[currency]:config.trade.min_worth.default]);
-  });
-  
-
-  getCurrencies(true).forEach(async (currency) => {
-    await db.query(`INSERT INTO MinOrderWorth (symbol, worth) VALUES
-      ($1, $2)`,[currency, config.order.min_worth[currency]?config.order.min_worth[currency]:config.order.min_worth.default]);
-  });
-
-  // let p2 = db.query(`INSERT INTO MinOrderWorth (symbol, worth) VALUES
-  // ($1, $2),
-  // ($3, $4),
-  // ($5, $6),
-  // ($7, $8)
-  // `,['BTC', 1000000, 'ETH', 600000, 'LTC', 500000, 'EOS', 500000]);
-  
-  let p3 = db.query(`INSERT INTO VolumeFilter (type, percent) VALUES
-  ($1, $2),
-  ($3, $4)
-  `,['trade', 0, 'order', 0]);
-  
-  let p4 = db.query(`INSERT INTO MinVolumeRatio (ratio) VALUES
-  ($1)
-  `,[3.5]);
-
-  await Promise.all([p3, p4]);
+    for(currency of getCurrencies(true)) {
+      await db.query(`INSERT INTO MinOrderWorth (symbol, worth) VALUES
+        ($1, $2)`,
+        [currency, config.order.min_worth[currency]?config.order.min_worth[currency]:config.order.min_worth.default]);
+    }
+    
+    await db.query(`INSERT INTO VolumeFilter (type, percent) VALUES
+    ($1, $2),
+    ($3, $4)
+    `,['trade', 0, 'order', 0]);
+    
+    await db.query(`INSERT INTO MinVolumeRatio (ratio) VALUES
+    ($1)
+    `,[3.5]);
+  } catch(e) {
+    return Promise.reject(e)
+  }
 }
 
 
@@ -85,10 +76,13 @@ db.query('DROP SCHEMA public CASCADE')
           insertData().then(() => {
             console.log("--> Updating Tables");
             clearInterval(interval_id);
+          }).catch((err) => {
+            console.error("Failed to insert data into table.");
+            console.error(err.stack)
           });
         }).catch((err) => {
-          console.error("Migration failed");
-          throw err;
+          console.error("Failed to create table.");
+          console.error(err.stack)
         });
       })
   })
